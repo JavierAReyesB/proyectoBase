@@ -49,7 +49,7 @@ export function Modal({
             // posicionamiento centrado
             'fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2',
             // estilo glass & animaciones (idéntico al Card)
-            'rounded-lg border border-white/40 bg-white/75 backdrop-blur-md text-card-foreground shadow-xl shadow-black/10',
+            'rounded-lg border border-white/20 bg-white/80 backdrop-blur-md text-card-foreground shadow-xl shadow-black/10',
             // padding base
             'p-6',
             // tamaño elegido
