@@ -20,6 +20,9 @@ export function useDashboard() {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [maxZ, setMaxZ] = useState(1);
+    const [selectedWidgets, setSelectedWidgets] = useState<WidgetType[]>([]);
+
+  
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +39,11 @@ export function useDashboard() {
   useEffect(() => {
     localStorage.setItem('dashboard-widgets', JSON.stringify(widgets));
   }, [widgets]);
+
+   // AGREGAR AQUÍ:
+  useEffect(() => {
+    if (!widgetsModalOpen) setSelectedWidgets([]);
+  }, [widgetsModalOpen]);
 
   /* ---------- helpers ---------- */
   const bringToFront = (id: string) => {
@@ -72,7 +80,7 @@ export function useDashboard() {
     const cfg = AVAILABLE_WIDGETS.find((w) => w.type === type)!;
     const pos = findFreePos(cfg.defaultSize);
     const newWidget: Widget = {
-      id: `w-${Date.now()}`,
+      id: `w-${Date.now()}-${Math.random()}`,
       type,
       title: cfg.title,
       position: pos,
@@ -168,5 +176,7 @@ export function useDashboard() {
     bringToFront,
     handleMouseDown,
     startResize,
+    selectedWidgets,
+    setSelectedWidgets,
   };
 }

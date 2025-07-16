@@ -1,66 +1,103 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { DrawerState, DrawerSize } from './drawerTypes'
-import type { MinimizedDrawerInfo } from './MinimizedDrawersBar'
+import type { MinimizedDrawerInfo } from './drawerTypes'
 
 export function useDrawerManager() {
   const [openDrawers, setOpenDrawers] = useState<DrawerState[]>([])
   const [minimizedDrawers, setMinimizedDrawers] = useState<DrawerState[]>([])
+  const [hydrated, setHydrated] = useState(false)
 
-  /** Abrir un nuevo drawer si no está abierto */
+  // 1) Al montar en cliente, rehidrato desde sessionStorage
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('minimizedDrawers')
+      if (raw) {
+        const arr = JSON.parse(raw) as DrawerState[]
+        setMinimizedDrawers(arr)
+      }
+    } catch {
+      // nada si falla
+    } finally {
+      setHydrated(true)
+    }
+  }, [])
+
+  // 2) Cada vez que cambian los minimizados (ya hidratado), persisto
+  useEffect(() => {
+    if (!hydrated) return
+    // sólo guardamos la parte serializable
+    const serializable = minimizedDrawers.map(({ id, title, width, isPinned, icon, instanceId }) => ({
+      id, title, width, isPinned, icon, instanceId
+    }))
+    sessionStorage.setItem('minimizedDrawers', JSON.stringify(serializable))
+  }, [hydrated, minimizedDrawers])
+
   const openDrawer = useCallback((drawer: DrawerState) => {
-    setOpenDrawers((prev) => {
-      const exists = prev.find((d) => d.id === drawer.id)
-      return exists ? prev : [...prev, drawer]
-    })
+    setOpenDrawers(prev =>
+      prev.find(d => d.id === drawer.id) ? prev : [...prev, drawer]
+    )
   }, [])
 
-  /** Cerrar completamente (de abierto y minimizado) */
   const closeDrawer = useCallback((id: string) => {
-    setOpenDrawers((prev) => prev.filter((d) => d.id !== id))
-    setMinimizedDrawers((prev) => prev.filter((d) => d.id !== id))
+    setOpenDrawers(prev => prev.filter(d => d.id !== id))
+    setMinimizedDrawers(prev => prev.filter(d => d.id !== id))
   }, [])
 
-  /** Minimizar un drawer pasando su objeto completo */
   const minimizeDrawer = useCallback((drawer: DrawerState) => {
-    setOpenDrawers((prev) => prev.filter((d) => d.id !== drawer.id))
-    setMinimizedDrawers((prev) => [...prev, drawer])
+    setOpenDrawers(prev => prev.filter(d => d.id !== drawer.id))
+    setMinimizedDrawers(prev => [...prev, drawer])
   }, [])
 
-  /** Restaurar desde la barra inferior */
   const restoreDrawer = useCallback((id: string) => {
-    setMinimizedDrawers((prev) => {
-      const target = prev.find((d) => d.id === id)
+    setMinimizedDrawers(prev => {
+      const target = prev.find(d => d.id === id)
       if (!target) return prev
-      setOpenDrawers((open) => [...open, target])
-      return prev.filter((d) => d.id !== id)
+      openDrawer(target)
+      return prev.filter(d => d.id !== id)
     })
+  }, [openDrawer])
+
+  const resizeDrawer = useCallback((id: string, width: DrawerSize) => {
+    setOpenDrawers(prev =>
+      prev.map(d => (d.id === id ? { ...d, width } : d))
+    )
   }, [])
 
-  /** Agrupación para la MinimizedDrawersBar */
-  const groupedMinimizedDrawers: Map<string, MinimizedDrawerInfo[]> = new Map()
+  const pinDrawer = useCallback((id: string, isPinned: boolean) => {
+    setOpenDrawers(prev =>
+      prev.map(d => (d.id === id ? { ...d, isPinned } : d))
+    )
+  }, [])
 
-  for (const drawer of minimizedDrawers) {
-    const groupKey = typeof drawer.title === 'string' ? drawer.title : 'Otros'
-    const group = groupedMinimizedDrawers.get(groupKey) || []
+  // Agrupación para la barra de minimizados
+  const groupedMinimizedDrawers = new Map<string, MinimizedDrawerInfo[]>()
+  for (const d of minimizedDrawers) {
+    const key = typeof d.title === 'string' ? d.title : 'Otros'
+    const group = groupedMinimizedDrawers.get(key) || []
     group.push({
-      id: drawer.id,
-      title: drawer.title,
-      width: drawer.width,
-      isPinned: drawer.isPinned,
-      icon: drawer.icon,
-      instanceId: drawer.instanceId
+      id: d.id,
+      title: d.title,
+      width: d.width,
+      isPinned: d.isPinned,
+      icon: d.icon,
+      instanceId: d.instanceId
     })
-    groupedMinimizedDrawers.set(groupKey, group)
+    groupedMinimizedDrawers.set(key, group)
   }
 
   return {
+    // para el overlay
+    hydrated,
     openDrawers,
-    openDrawer,
-    closeDrawer,
     minimizeDrawer,
+    closeDrawer,
     restoreDrawer,
-    groupedMinimizedDrawers
+    resizeDrawer,
+    pinDrawer,
+    groupedMinimizedDrawers,
+    // para quien abra un drawer
+    openDrawer
   }
 }
