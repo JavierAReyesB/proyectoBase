@@ -1,5 +1,10 @@
+'use client'
+
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+
 
 /* ---------- Tipado ---------- */
 interface Message {
@@ -123,9 +128,8 @@ const ChatPanel: React.FC = () => {
     })
   }
 
-  /* ---------- Render ---------- */
   return (
-    <div className='flex flex-col h-full'>
+    <div className='relative flex flex-col h-full max-h-[90vh]'>
       {/* Lista de mensajes scrolleable */}
       <div className='flex-1 overflow-y-auto p-4 space-y-2 pb-4'>
         {messages.map((m) => (
@@ -134,14 +138,8 @@ const ChatPanel: React.FC = () => {
             className={`flex ${m.fromMe ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`
-                px-3 py-2 rounded-lg text-sm max-w-[90%] break-words
-                ${
-                  m.fromMe
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-800'
-                }
-              `}
+              className={`px-3 py-2 rounded-lg text-sm max-w-[90%] break-words ${m.fromMe ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'
+                }`}
             >
               {m.fromMe ? m.text : assistantTextToJSX(m.text)}
             </div>
@@ -149,24 +147,31 @@ const ChatPanel: React.FC = () => {
         ))}
       </div>
 
-      {/* Input fijo en la parte inferior */}
-      <div className='flex gap-2 border-t p-3 bg-white sticky bottom-16'>
-        <input
-          className='flex-1 border rounded px-2 py-1 text-sm focus:outline-none'
+      {/* Input fijo adaptado */}
+      <div
+        className={`
+        flex gap-2 border-t p-3 bg-white
+        ${typeof window !== 'undefined' && window.innerWidth < 840 ? 'fixed bottom-0 left-0 w-full' : 'sticky bottom-4'}
+      `}
+      >
+        <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder='Escribe tu mensaje…'
           onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          className='flex-1'
         />
-        <button
+        <Button
           onClick={sendMessage}
-          className='px-3 py-1 bg-blue-600 text-white rounded text-sm'
+          size='sm' // o 'xs', 'default', etc.
         >
           Enviar
-        </button>
+        </Button>
+
       </div>
     </div>
   )
+
 }
 
 export default ChatPanel

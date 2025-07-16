@@ -135,26 +135,25 @@ export function GenericDrawer({
   /* Tailwind solo controla la anchura y los bordes; el z-index es inline */
   const drawerNode = (
     <div
-      className={cn(
-        'fixed top-0 bottom-0 bg-background shadow-lg transition-all duration-300 ease-in-out flex flex-col',
-        isSecondDrawer ? 'left-0 border-r' : 'right-0 border-l',
-        /* ancho responsivo */
-        isMobile
+    className={cn(
+      'fixed top-0 bottom-0  border border-white/20 bg-white/95 backdrop-blur-md text-card-foreground shadow-xl shadow-black/10 transition-all duration-300 cursor-pointer flex flex-col',
+      isSecondDrawer ? 'left-0 border-r' : 'right-0 border-l',
+      isMobile
+        ? 'w-full'
+        : isSecondDrawer
+        ? isFullWidth
           ? 'w-full'
-          : isSecondDrawer
-          ? isFullWidth
-            ? 'w-full'
-            : 'w-1/2'
-          : isPinned
-          ? isFullWidth
-            ? 'w-full'
-            : 'w-1/2'
-          : isFullWidth
+          : 'w-1/2'
+        : isPinned
+        ? isFullWidth
           ? 'w-full'
-          : 'w-[70%]'
-      )}
-      style={{ zIndex: drawerZ }}
-    >
+          : 'w-1/2'
+        : isFullWidth
+        ? 'w-full'
+        : 'w-[70%]'
+    )}
+    style={{ zIndex: drawerZ }}
+  >
       {/* header: controles */}
       <div className='sticky top-0 z-20 flex items-center justify-end gap-4 p-2 border-b bg-background'>
         {onPin && (

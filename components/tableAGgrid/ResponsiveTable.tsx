@@ -1,79 +1,66 @@
 'use client'
 
-/* -------------------------------------------------------------
- *  IMPORTS BÁSICOS
- * ----------------------------------------------------------- */
+import { useEffect, useState, useRef, useCallback, PropsWithChildren, ReactNode } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 
-import {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  PropsWithChildren,
-  ReactNode
-} from 'react'
-
 import MobileCard, { MobileCardProps } from '../tableAGgrid/MobileCard'
 
-/* ➜  IMPORTA el módulo de estilos con el efecto glass */
-import styles from './ResponsiveTable.module.css'
-
-/* -------------------------------------------------------------
- *  REGISTRO DE MÓDULOS – AG GRID COMMUNITY v34+
- * ----------------------------------------------------------- */
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community'
 ModuleRegistry.registerModules([AllCommunityModule])
 
-/* -------------------------------------------------------------
- *  TIPOS DE PROPS
- * ----------------------------------------------------------- */
+/* ---------- tipos ---------- */
 interface ResponsiveTableProps<T extends Record<string, any>> {
   columnDefs: any[]
   rowData: T[]
+  /** px a partir de los cuales pasamos a vista móvil (sobre el CONTENEDOR) */
   breakpoint?: number
   pagination?: boolean
   renderCard?: (row: T) => ReactNode
   mobileCardProps?: Omit<MobileCardProps<T>, 'data'>
 }
 
-/* -------------------------------------------------------------
- *  COMPONENTE
- * ----------------------------------------------------------- */
+/* ---------- componente ---------- */
 export default function ResponsiveTable<T extends Record<string, any>>(
   props: PropsWithChildren<ResponsiveTableProps<T>>
 ) {
   const {
     columnDefs,
     rowData,
-    breakpoint = 1024,
+    breakpoint = 640,
     pagination = true,
     renderCard,
     mobileCardProps
   } = props
 
-  const [isMobile, setIsMobile] = useState(false)
-  const gridRef = useRef<AgGridReact<T>>(null)
+  /* refs ------------------------------------------------------------- */
+  const wrapperRef = useRef<HTMLDivElement>(null)   // mide ancho contenedor
+  const gridRef    = useRef<AgGridReact<T>>(null)   // acceso a API grid
 
-  /* Detectar tamaño de pantalla */
+  /* móvil / escritorio ---------------------------------------------- */
+  const [isMobile, setIsMobile] = useState(false)
+
+  /* observa cambios de tamaño en el contenedor ---------------------- */
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < breakpoint)
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    if (!wrapperRef.current) return
+    const ro = new ResizeObserver(([entry]) => {
+      setIsMobile(entry.contentRect.width < breakpoint)
+      gridRef.current?.api?.sizeColumnsToFit()      // refit si cambia
+    })
+    ro.observe(wrapperRef.current)
+    return () => ro.disconnect()
   }, [breakpoint])
 
-  /* Ajustar columnas al ancho */
-  const onGridReady = useCallback(() => {
-    gridRef.current?.api.sizeColumnsToFit()
+  /* auto‑fit inicial (usa params.api) ------------------------------- */
+  const onGridReady = useCallback((params: any) => {
+    params.api.sizeColumnsToFit()
   }, [])
 
-  /* --------- MÓVIL / TABLET --------- */
+  /* ---------- MÓVIL / TABLET ---------- */
   if (isMobile) {
     return (
-      <div className='space-y-4'>
+      <div ref={wrapperRef} className="space-y-4">
         {rowData.map((row, idx) =>
           renderCard ? (
             <div key={idx}>{renderCard(row)}</div>
@@ -85,19 +72,16 @@ export default function ResponsiveTable<T extends Record<string, any>>(
     )
   }
 
-  /* --------- ESCRITORIO --------- */
+  /* ---------- ESCRITORIO ---------- */
   return (
-    <div
-      className='ag-theme-alpine glass-table w-full'
-      style={{ minHeight: 400 }}
-    >
+    <div ref={wrapperRef} className="ag-theme-alpine w-full" style={{ minHeight: 400 }}>
       <AgGridReact<T>
-        theme='legacy'
         ref={gridRef}
         columnDefs={columnDefs}
         rowData={rowData}
         onGridReady={onGridReady}
-        domLayout='autoHeight'
+        theme="legacy"                 /* evita mezcla Quartz vs CSS */
+        domLayout="autoHeight"
         pagination={pagination}
         paginationAutoPageSize
         defaultColDef={{

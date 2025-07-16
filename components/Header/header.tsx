@@ -25,10 +25,10 @@ import { Search } from 'lucide-react'
 
 interface HeaderProps {
   activeSection: string
-  setSidebarOpen: (open: boolean) => void
+  
 }
 
-export function Header({ activeSection, setSidebarOpen }: HeaderProps) {
+export function Header({ activeSection }: HeaderProps) {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {

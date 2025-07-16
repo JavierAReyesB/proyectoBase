@@ -1,6 +1,6 @@
 "use client"
 
-import { SidebarMenuSubItem } from "@/components/ui/sidebar"
+// import { SidebarMenuSubItem } from "@/components/ui/sidebar"
 
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
@@ -679,7 +679,7 @@ export {
   SidebarMenuSkeleton,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem,
+  // SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarSeparator,
