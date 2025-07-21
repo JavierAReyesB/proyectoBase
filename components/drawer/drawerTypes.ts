@@ -1,3 +1,5 @@
+// components/drawer/drawerTypes.ts
+
 import type { ReactNode } from 'react'
 
 export type DrawerSize = 'quarter' | 'third' | 'half' | 'full'
@@ -7,16 +9,21 @@ export type DrawerSize = 'quarter' | 'third' | 'half' | 'full'
  */
 export interface DrawerState {
   id: string
-  title: React.ReactNode
-  content: React.ReactNode
+  title: ReactNode
+  content: ReactNode
   width: DrawerSize
   isPinned: boolean
-  icon?: React.ReactNode
+  icon?: ReactNode
   instanceId?: string
+
+  /** Clave para saber qué tipo de contenido reconstruir al restaurar */
+  contentKey: string
+  /** Datos serializables con los que se renderiza `content` */
+  contentData?: any
 }
 
 /**
- * Representa un drawer minimizado (sin el content).
+ * Representa un drawer minimizado (sin el contenido ReactNode).
  */
 export interface MinimizedDrawerInfo {
   id: string
@@ -25,4 +32,9 @@ export interface MinimizedDrawerInfo {
   isPinned: boolean
   icon?: ReactNode
   instanceId?: string
+
+  /** Igual que en DrawerState, para reconstruir */
+  contentKey: string
+  /** Igual que en DrawerState, datos serializables */
+  contentData?: any
 }

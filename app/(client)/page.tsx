@@ -1,8 +1,10 @@
+// app/(tu‑ruta)/dashboard/page.tsx
 'use client'
 
-import React, { useState, useEffect, type ReactNode } from 'react'
-import { PageWrapper } from '@/app/layout/PageWrapper'
+import React from 'react'
+import { PageWrapper } from '@/app/(client)/layout/PageWrapper'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -11,7 +13,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import {
   BarChart,
   Bar,
@@ -20,23 +21,18 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts'
-import { GenericDrawer } from '@/components/drawer/GenericDrawer'
 import { useDrawerContext } from '@/components/drawer/DrawerProvider'
-import type { CardSize } from '@/components/ui/card' // ✅ reutilización aquí
 
-/* ────────────── Tipo local para las tarjetas ────────────── */
 interface DashboardCard {
   key: string
   title: string
   value: string
   badge: string
   badgeVariant: string
-  content: ReactNode
-  size?: CardSize
+  content: React.ReactNode
 }
 
-/* ────────────── Datos de ejemplo ────────────── */
-
+// Datos de ejemplo
 const chartData = [
   { name: 'Ene', usuarios: 240 },
   { name: 'Feb', usuarios: 360 },
@@ -52,7 +48,6 @@ const cards: DashboardCard[] = [
     value: '1,240',
     badge: '+8% este mes',
     badgeVariant: 'secondary',
-    size: 'md',
     content: (
       <p>
         Este mes se han registrado más usuarios activos que el anterior, con un
@@ -66,7 +61,6 @@ const cards: DashboardCard[] = [
     value: '324',
     badge: '+5 desde abril',
     badgeVariant: 'outline',
-    size: 'md',
     content: (
       <p>
         Se han firmado 324 contratos, superando los valores de los últimos tres
@@ -80,7 +74,6 @@ const cards: DashboardCard[] = [
     value: '57',
     badge: '+14 nuevos',
     badgeVariant: 'destructive',
-    size: 'md',
     content: (
       <p>
         Actualmente hay 57 tickets activos. La mayoría corresponden a soporte
@@ -94,7 +87,6 @@ const cards: DashboardCard[] = [
     value: '92 %',
     badge: 'Excelente',
     badgeVariant: 'default',
-    size: 'md',
     content: (
       <p>
         El índice de satisfacción de usuarios es del 92 %, manteniéndose
@@ -104,54 +96,32 @@ const cards: DashboardCard[] = [
   }
 ]
 
-/* ───────────────────────────────────────────── */
-
 export default function DashboardPage() {
-  const [rightOpen, setRightOpen] = useState(false)
-  const [rightPinned, setRightPinned] = useState(false)
-  const [rightWidth, setRightWidth] = useState<'full' | 'half'>('half')
-  const [rightKey, setRightKey] = useState<string | null>(null)
+  const { openDrawer } = useDrawerContext()
 
-  const [leftOpen, setLeftOpen] = useState(false)
-  const [leftWidth, setLeftWidth] = useState<'full' | 'half'>('half')
-  const [leftKey, setLeftKey] = useState<string | null>(null)
+  function handleCardClick(card: DashboardCard) {
+  const { key, title, value, badge, badgeVariant } = card
 
-  const { openDrawers, closeDrawer } = useDrawerContext()
+  openDrawer({
+    id:          `dashboard-${key}`,
+    title,
+    width:       'half',
+    isPinned:    false,
+    instanceId:  `dashboard-${key}`,
 
-  useEffect(() => {
-    if (!openDrawers.length) return
+    /* --- solo datos planos --- */
+    contentKey:  'dashboard-card',
+    contentData: { key, title, value, badge, badgeVariant },
 
-    const restored = openDrawers[openDrawers.length - 1]
-    if (!restored.instanceId) return
+    /* UI que se ve al volver a agrandarlo */
+    content: (
+      <p>
+        {title}: {value} ({badge})
+      </p>
+    )
+  })
+}
 
-    const key = restored.instanceId
-
-    if (rightOpen && rightPinned) {
-      setLeftKey(key)
-      setLeftOpen(true)
-    } else {
-      setRightKey(key)
-      setRightOpen(true)
-      setLeftOpen(false)
-    }
-
-    closeDrawer(restored.id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openDrawers])
-
-  const rightCard = cards.find((c) => c.key === rightKey)
-  const leftCard = cards.find((c) => c.key === leftKey)
-
-  const handleCardClick = (key: string) => {
-    if (rightOpen && rightPinned) {
-      setLeftKey(key)
-      setLeftOpen(true)
-    } else {
-      setRightKey(key)
-      setRightOpen(true)
-      setLeftOpen(false)
-    }
-  }
 
   return (
     <div className='flex flex-col h-full'>
@@ -165,8 +135,7 @@ export default function DashboardPage() {
           {cards.map((card) => (
             <Card
               key={card.key}
-              size={card.size}
-              onClick={() => handleCardClick(card.key)}
+              onClick={() => handleCardClick(card)}
               className='cursor-pointer hover:shadow-lg transition-shadow'
             >
               <CardHeader>
@@ -183,7 +152,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Gráfico */}
-        <section className='bg-white dark:bg-zinc-900 rounded-md border mt-8 p-4'>
+        <section className='bg-white rounded-md border mt-8 p-4'>
           <h2 className='text-lg font-semibold mb-4'>
             Usuarios registrados por mes
           </h2>
@@ -222,33 +191,6 @@ export default function DashboardPage() {
           </Table>
         </section>
       </PageWrapper>
-
-      <GenericDrawer
-        title={rightCard?.title ?? ''}
-        visible={rightOpen}
-        onClose={() => setRightOpen(false)}
-        width={rightWidth}
-        toggleSize={() =>
-          setRightWidth((p) => (p === 'full' ? 'half' : 'full'))
-        }
-        onPin={setRightPinned}
-        hideBackdrop={leftOpen}
-        instanceId={rightKey ?? undefined}
-      >
-        {rightCard?.content}
-      </GenericDrawer>
-
-      <GenericDrawer
-        title={leftCard?.title ?? ''}
-        visible={leftOpen}
-        onClose={() => setLeftOpen(false)}
-        isSecondDrawer
-        width={leftWidth}
-        toggleSize={() => setLeftWidth((p) => (p === 'full' ? 'half' : 'full'))}
-        instanceId={leftKey ?? undefined}
-      >
-        {leftCard?.content}
-      </GenericDrawer>
     </div>
   )
 }

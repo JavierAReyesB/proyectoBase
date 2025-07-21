@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState } from 'react'
+import { useState, useEffect  } from 'react'
 import { Maximize2, X, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -10,6 +10,8 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover'
+import { saveMapToLocalStorage } from '@/app/utils/localStorageMapUtils'
+
 
 type DrawerSize = 'quarter' | 'third' | 'half' | 'full'
 
@@ -28,12 +30,19 @@ interface MinimizedDrawersBarProps {
   onCloseIndividual: (id: string) => void
 }
 
+ const STORAGE_KEY = 'minimizedDrawers'
+ 
+
 export function MinimizedDrawersBar({
   groupedDrawers,
   onRestoreIndividual,
   onCloseIndividual
 }: MinimizedDrawersBarProps) {
   const [openPopoverTitle, setOpenPopoverTitle] = useState<string | null>(null)
+
+  useEffect(() => {
+    saveMapToLocalStorage(STORAGE_KEY, groupedDrawers)
+  }, [groupedDrawers])
 
   if (groupedDrawers.size === 0) return null
 

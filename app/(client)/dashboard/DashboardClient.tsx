@@ -4,7 +4,7 @@ import { Plus, GripVertical, X } from 'lucide-react';
 import { Button }   from '@/components/ui/button';
 import { CardTitle } from '@/components/ui/card';
 import { Modal }    from '@/components/ui/modal';
-import { PageWrapper } from '@/app/layout/PageWrapper';
+import { PageWrapper } from '@/app/(client)/layout/PageWrapper';
 import { ResizableCard, ResizableCardHeader, ResizableCardContent } from '@/components/ui/ResizableCard';
 import { AVAILABLE_WIDGETS } from './availableWidgets';
 import { useDashboard } from './useDashboard';

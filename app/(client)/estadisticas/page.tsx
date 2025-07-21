@@ -1,6 +1,6 @@
 'use client'
 
-import { PageWrapper } from '@/app/layout/PageWrapper'
+import { PageWrapper } from '@/app/(client)/layout/PageWrapper'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {

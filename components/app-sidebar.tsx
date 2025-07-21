@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import {
   Home,
@@ -22,34 +23,30 @@ import {
 } from '@/components/ui/sidebar'
 import { SidebarToggleButton } from './sidebar-toggle-button'
 
-/* -------------------------------------------------------------
- * NUEVA RUTA AÑADIDA:
- *  - title: "Dashboard"
- *  - icon : LayoutDashboard
- *  - url  : "/dashboard"
- * ------------------------------------------------------------ */
+/* Navegación principal */
 const mainNavigation = [
-  { title: 'Inicio', icon: Home, url: '/', isActive: true },
-  { title: 'Usuarios', icon: Users, url: 'usuarios' },
-  { title: 'Contratos', icon: Package, url: 'contratos' },
-  { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'Trial Page', icon: BarChart2, url: '/trialpage' } // 👈 nuevo elemento
+  { title: 'Inicio',     icon: Home,           url: '/',           isActive: false },
+  { title: 'Usuarios',   icon: Users,          url: '/usuarios' },
+  { title: 'Contratos',  icon: Package,        url: '/contratos' },
+  { title: 'Dashboard',  icon: LayoutDashboard,url: '/dashboard' },
+  { title: 'Trial Page', icon: BarChart2,      url: '/trialpage' }
 ]
 
 export function AppSidebar() {
   const { state, isMobile } = useSidebar()
 
   return (
-    <Sidebar collapsible='icon' className='bg-[#1E293B] text-white'>
+    <Sidebar collapsible="icon" className="bg-[#1E293B] text-white">
       {/* ---------- CONTENIDO PRINCIPAL ---------- */}
-      <SidebarContent className='bg-[#1E293B]'>
+      <SidebarContent className="bg-[#1E293B]">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={item.isActive}>
-                    <a
+                    {/* Usamos Link para navegación client‑side */}
+                    <Link
                       href={item.url}
                       className={cn(
                         'flex items-center justify-start gap-2',
@@ -62,7 +59,7 @@ export function AppSidebar() {
                           'group-hover:w-full group-hover:px-2'
                       )}
                     >
-                      <item.icon className='size-4 shrink-0 text-white' />
+                      <item.icon className="size-4 shrink-0 text-white" />
                       <span
                         className={cn(
                           'whitespace-nowrap text-white',
@@ -77,7 +74,7 @@ export function AppSidebar() {
                       >
                         {item.title}
                       </span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -87,12 +84,12 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* ---------- FOOTER ---------- */}
-      <SidebarFooter className='bg-[#1E293B]'>
+      <SidebarFooter className="bg-[#1E293B]">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a
-                href='#'
+              <Link
+                href="#"
                 className={cn(
                   'flex items-center justify-start gap-2',
                   'transition-[width,padding] duration-200 ease-linear',
@@ -104,7 +101,7 @@ export function AppSidebar() {
                     'group-hover:w-full group-hover:px-2'
                 )}
               >
-                <Settings className='size-4 shrink-0 text-white' />
+                <Settings className="size-4 shrink-0 text-white" />
                 <span
                   className={cn(
                     'whitespace-nowrap text-white',
@@ -119,7 +116,7 @@ export function AppSidebar() {
                 >
                   Avanzadi
                 </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

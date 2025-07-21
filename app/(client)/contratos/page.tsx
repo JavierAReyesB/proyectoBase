@@ -1,6 +1,6 @@
 'use client'
 
-import { PageWrapper } from '@/app/layout/PageWrapper'
+import { PageWrapper } from '@/app/(client)/layout/PageWrapper'
 import ContratosPanel from './ContratosPanel'
 
 export default function ContratosPage() {

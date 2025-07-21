@@ -1,4 +1,4 @@
-/* PageWrapper.tsx */
+// components/PageWrapper.tsx
 'use client'
 
 import React, { useState } from 'react'
@@ -6,8 +6,7 @@ import { cn } from '@/lib/utils'
 import SidebarPanel from './SidebarPanel'
 import SidebarToggleBar from './SidebarToggleBar'
 import ChatPanel from './ChatPanel'
-import Enhanced3DBackground from '@/styles/enhanced3dbackground' // <— asegúrate de que la
-//                              ruta+mayúsculas coincide con el nombre real del fichero
+import Enhanced3DBackground from '@/styles/enhanced3dbackground'
 
 type PanelKey = 'chat'
 
@@ -62,7 +61,6 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
           panels={panels}
           onClose={() => setActivePanel(null)}
         />
-
         <SidebarToggleBar active={activePanel} onToggle={setActivePanel} />
       </div>
     </div>

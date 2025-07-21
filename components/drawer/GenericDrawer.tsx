@@ -13,47 +13,47 @@ import { useDrawerContext } from './DrawerProvider'
 type DrawerSize = 'quarter' | 'third' | 'half' | 'full'
 
 interface GenericDrawerProps {
-  /* Obligatorios */
+  /** Título o encabezado del drawer */
   title: React.ReactNode
+  /** Si está visible o no */
   visible: boolean
+  /** Callback al cerrar */
   onClose: () => void
 
-  /* Contenido */
+  /** Contenido interno */
   children?: React.ReactNode
   footer?: React.ReactNode
   loading?: boolean
   contentClassName?: string
 
-  /* Anchura */
+  /** Anchura externa (controlada desde fuera) */
   width?: DrawerSize
   toggleSize?: () => void
 
-  /* Comportamiento */
+  /** Comportamiento extra */
   isSecondDrawer?: boolean
   onPin?: (pinned: boolean) => void
   onMinimize?: () => void
   hideBackdrop?: boolean
   onOpen?: () => void
 
-  /* Extras en header */
+  /** Espacios adicionales en el header */
   headerActions?: React.ReactNode
 
-  /* Icono e instancia opcionales para minimizado */
+  /** Icono e instancia para la vista minimizada */
   instanceId?: string
   icon?: React.ReactNode
+
+  /** Clave para reconstruir el contenido al restaurar */
+  contentKey: string
+  /** Datos serializables que representó el drawer */
+  contentData: any
 }
 
-/* ------------------------------ Z-INDEX ---------------------------------- */
-/* Cada cajón parte de su “base”, y suma extras según su estado:            */
-/*   – base 1000  → cajón derecho                                           */
-/*   – base 2000  → cajón izquierdo                                         */
-/*   – +3000      → si se expande a full-width                              */
-/*   – + 500      → si está fijado (“pinned”)                               */
 const Z_RIGHT_BASE = 1000
 const Z_LEFT_BASE = 2000
 const BONUS_FULL = 3000
 const BONUS_PINNED = 500
-/* ------------------------------------------------------------------------ */
 
 export function GenericDrawer({
   title,
@@ -72,24 +72,25 @@ export function GenericDrawer({
   onOpen,
   headerActions,
   instanceId,
-  icon
+  icon,
+  contentKey,
+  contentData
 }: GenericDrawerProps) {
   const [internalWidth, setInternalWidth] = useState<DrawerSize>('half')
   const [isPinned, setIsPinned] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const drawerContext = useDrawerContext()
 
-  /* Anchura */
+  // Determina anchura actual
   const currentWidth = externalWidth || internalWidth
   const isFullWidth = currentWidth === 'full'
 
-  /* ------------- Cálculo unificado de la pila (z-index) ------------------ */
+  // z-index dinámico
   const baseZ = isSecondDrawer ? Z_LEFT_BASE : Z_RIGHT_BASE
-  const drawerZ =
-    baseZ + (isFullWidth ? BONUS_FULL : 0) + (isPinned ? BONUS_PINNED : 0)
+  const drawerZ = baseZ + (isFullWidth ? BONUS_FULL : 0) + (isPinned ? BONUS_PINNED : 0)
   const backdropZ = drawerZ - 1
-  /* ---------------------------------------------------------------------- */
 
+  // Detectar móvil
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 840)
     check()
@@ -97,6 +98,7 @@ export function GenericDrawer({
     return () => window.removeEventListener('resize', check)
   }, [])
 
+  // Llamar onOpen solo en la primera apertura
   const firstOpen = useRef(false)
   useEffect(() => {
     if (visible && !firstOpen.current) {
@@ -108,7 +110,7 @@ export function GenericDrawer({
   const handleSizeToggle = () =>
     toggleSize
       ? toggleSize()
-      : setInternalWidth((p) => (p === 'full' ? 'half' : 'full'))
+      : setInternalWidth((prev) => (prev === 'full' ? 'half' : 'full'))
 
   const handlePin = () => {
     const next = !isPinned
@@ -125,48 +127,43 @@ export function GenericDrawer({
       width: currentWidth,
       isPinned,
       icon,
-      instanceId
+      instanceId,
+      contentKey,
+      contentData
     })
     onClose()
   }
 
   if (!visible) return null
 
-  /* Tailwind solo controla la anchura y los bordes; el z-index es inline */
   const drawerNode = (
     <div
-    className={cn(
-      'fixed top-0 bottom-0  border border-white/20 bg-white/95 backdrop-blur-md text-card-foreground shadow-xl shadow-black/10 transition-all duration-300 cursor-pointer flex flex-col',
-      isSecondDrawer ? 'left-0 border-r' : 'right-0 border-l',
-      isMobile
-        ? 'w-full'
-        : isSecondDrawer
-        ? isFullWidth
+      className={cn(
+        'fixed top-0 bottom-0 border border-white/20 bg-white/95 backdrop-blur-md text-card-foreground shadow-xl shadow-black/10 transition-all duration-300 flex flex-col',
+        isSecondDrawer ? 'left-0 border-r' : 'right-0 border-l',
+        isMobile
           ? 'w-full'
-          : 'w-1/2'
-        : isPinned
-        ? isFullWidth
+          : isSecondDrawer
+          ? isFullWidth
+            ? 'w-full'
+            : 'w-1/2'
+          : isPinned
+          ? isFullWidth
+            ? 'w-full'
+            : 'w-1/2'
+          : isFullWidth
           ? 'w-full'
-          : 'w-1/2'
-        : isFullWidth
-        ? 'w-full'
-        : 'w-[70%]'
-    )}
-    style={{ zIndex: drawerZ }}
-  >
-      {/* header: controles */}
+          : 'w-[70%]'
+      )}
+      style={{ zIndex: drawerZ }}
+    >
+      {/* Header: acciones */}
       <div className='sticky top-0 z-20 flex items-center justify-end gap-4 p-2 border-b bg-background'>
         {onPin && (
-          <Button
-            size='sm'
-            variant='ghost'
-            onClick={handlePin}
-            className='h-8 w-8 p-0'
-          >
+          <Button size='sm' variant='ghost' onClick={handlePin} className='h-8 w-8 p-0'>
             <Pin className={cn('h-4 w-4', isPinned && 'text-primary')} />
           </Button>
         )}
-
         {!isMobile && (
           <FilterSwitch
             id='size-toggle'
@@ -174,34 +171,21 @@ export function GenericDrawer({
             onCheckedChange={handleSizeToggle}
           />
         )}
-
-        {/* botón de minimizar */}
-        {onMinimize || drawerContext ? (
-          <Button
-            size='sm'
-            variant='ghost'
-            onClick={onMinimize || handleMinimize}
-            className='h-8 w-8 p-0'
-          >
-            <Minimize2 className='h-4 w-4' />
-          </Button>
-        ) : null}
-
-        {headerActions && (
-          <div className='flex items-center'>{headerActions}</div>
-        )}
-
         <Button
           size='sm'
           variant='ghost'
-          onClick={onClose}
+          onClick={onMinimize || handleMinimize}
           className='h-8 w-8 p-0'
         >
+          <Minimize2 className='h-4 w-4' />
+        </Button>
+        {headerActions && <div className='flex items-center'>{headerActions}</div>}
+        <Button size='sm' variant='ghost' onClick={onClose} className='h-8 w-8 p-0'>
           <X className='h-4 w-4' />
         </Button>
       </div>
 
-      {/* header: título */}
+      {/* Header: título */}
       <div className='flex items-center p-4 border-b bg-muted/50'>
         {typeof title === 'string' ? (
           <h2 className='text-lg font-semibold truncate flex-1'>{title}</h2>
@@ -210,7 +194,7 @@ export function GenericDrawer({
         )}
       </div>
 
-      {/* contenido */}
+      {/* Contenido */}
       <div className={cn('flex-1 overflow-auto p-4', contentClassName)}>
         {loading ? (
           <div className='flex items-center justify-center h-full'>
@@ -221,7 +205,7 @@ export function GenericDrawer({
         )}
       </div>
 
-      {/* footer */}
+      {/* Footer */}
       {footer && <div className='border-t bg-muted/50 p-4'>{footer}</div>}
     </div>
   )

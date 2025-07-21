@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { PageWrapper } from '@/app/layout/PageWrapper'
+import { PageWrapper } from '@/app/(client)/layout/PageWrapper'
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
 import type { ColDef } from 'ag-grid-community'
 

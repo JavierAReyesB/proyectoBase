@@ -12,25 +12,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { Modal } from '@/components/ui/modal'
 import { Search } from 'lucide-react'
-
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
 import type { ColDef } from 'ag-grid-community'
 import { useDrawerContext } from '@/components/drawer/DrawerProvider'
+import { ContratoDrawer } from './ContratoDrawer' // NUEVO
+import type { Proyecto } from './proyecto'
 
-interface Proyecto {
-  id: number
-  nombre: string
-  cliente: string
-  estado: 'En curso' | 'Pendiente' | 'Finalizado'
-  fechaInicio: string
-  fechaFin: string
-  presupuesto: number
-  responsable: string
-  departamento: string
-  prioridad: 'Alta' | 'Media' | 'Baja'
-  tecnologia: string
-  observaciones: string
-}
+
 
 const columnDefs: ColDef<Proyecto>[] = [
   { field: 'id', headerName: 'ID', maxWidth: 90 },
@@ -85,9 +73,11 @@ export default function ContratosPanel() {
   const [open, setOpen] = useState(false)
   const [tipo, setTipo] = useState('')
   const [nombre, setNombre] = useState('')
-
   const [rowData, setRowData] = useState<Proyecto[]>([])
   const [loading, setLoading] = useState(true)
+
+  const { openDrawer } = useDrawerContext()
+  const orden = 'fechaFin' // Puedes cambiarlo por otro criterio si lo necesitas
 
   useEffect(() => {
     fetch('/mock/proyectos.json')
@@ -106,30 +96,20 @@ export default function ContratosPanel() {
     console.log('Buscando contrato:', nombre)
   }
 
-  // 1️⃣ Obtén el contexto de drawers
-  const { openDrawer } = useDrawerContext()
-
-  // 2️⃣ Define el handler que abre el drawer
   const handleRowClick = (row: Proyecto) => {
     openDrawer({
       id: `contrato-${row.id}`,
       instanceId: `contrato-${row.id}`,
-      title: `Detalle: ${row.nombre}`,
-      content: (
-        <div className="space-y-2 text-sm">
-          <p><strong>Proyecto:</strong> {row.nombre}</p>
-          <p><strong>Cliente:</strong> {row.cliente}</p>
-          <p><strong>Inicio:</strong> {row.fechaInicio}</p>
-          <p><strong>Fin:</strong> {row.fechaFin}</p>
-          <p><strong>Responsable:</strong> {row.responsable}</p>
-          <p><strong>Presupuesto:</strong> {row.presupuesto.toLocaleString('es-ES')} €</p>
-          <p><strong>Prioridad:</strong> {row.prioridad}</p>
-          <p><strong>Tecnología:</strong> {row.tecnologia}</p>
-          <p><strong>Observaciones:</strong> {row.observaciones}</p>
-        </div>
-      ),
+      title: `Contrato: ${row.nombre}`,
       width: 'half',
-      isPinned: false
+      isPinned: false,
+      icon: null,
+      contentKey: 'contrato',
+      contentData: {
+        proyecto: row,
+        orden
+      },
+      content: <ContratoDrawer data={row} orden={orden} />
     })
   }
 
@@ -137,7 +117,9 @@ export default function ContratosPanel() {
     <>
       <div className="flex-1 rounded-md border border-muted p-4 overflow-auto">
         {loading ? (
-          <p className="text-center text-muted-foreground">Cargando datos…</p>
+          <p className="text-center text-muted-foreground">
+            Cargando datos…
+          </p>
         ) : rowData.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No hay contratos registrados todavía.
@@ -148,7 +130,6 @@ export default function ContratosPanel() {
             rowData={rowData}
             breakpoint={1024}
             pagination
-            // 3️⃣ Pasa tu handler al prop `onRowClick`
             onRowClick={handleRowClick}
             mobileCardProps={{
               titleField: 'nombre',
@@ -185,7 +166,9 @@ export default function ContratosPanel() {
             </Button>
           </div>
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Tipo de contrato</label>
+            <label className="block text-sm font-medium">
+              Tipo de contrato
+            </label>
             <Select value={tipo} onValueChange={setTipo}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona tipo de contrato" />
@@ -198,7 +181,9 @@ export default function ContratosPanel() {
             </Select>
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
             <Button onClick={() => setOpen(false)}>Guardar</Button>
           </div>
         </div>

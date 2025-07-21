@@ -17,7 +17,7 @@ import {
 } from 'recharts'
 
 /* ──────────────── Wrappers / utilidades globales ─────────────── */
-import { PageWrapper } from '@/app/layout/PageWrapper'
+import { PageWrapper } from '@/app/(client)/layout/PageWrapper'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 
