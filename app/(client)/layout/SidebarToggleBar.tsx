@@ -17,7 +17,7 @@ const SidebarToggleBar: React.FC<Props> = ({ active, onToggle }) => {
         className="fixed z-[9999] block md:hidden"
         style={{
           right: '1rem',
-          bottom: 'calc(1rem + env(safe-area-inset-bottom))',
+          bottom: 'calc(3.5rem + env(safe-area-inset-bottom))',
         }}
       >
         <button

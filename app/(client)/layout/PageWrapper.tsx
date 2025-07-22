@@ -37,7 +37,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
       {/* CONTENIDO PRINCIPAL */}
       <main
         className={cn(
-          'flex-1 overflow-y-auto max-h-[90dvh] md:max-h-screen pb-20 md:pb-0 transition-all duration-300 z-10',
+          'flex-1 overflow-y-auto max-h-[90dvh] md:max-h-screen pb-32 md:pb-0 transition-all duration-300 z-10',
           className
         )}
       >

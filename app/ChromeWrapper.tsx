@@ -7,6 +7,7 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { Header } from '@/components/Header/header'
 import { DrawerProvider } from '@/components/drawer/DrawerProvider'
 import DrawerOverlay from '@/components/drawer/DrawerOverlay'
+import MobileBottomBar from '@/components/Header/MobileBottomBar' 
 
 interface ChromeWrapperProps {
   children: ReactNode
@@ -31,6 +32,7 @@ export default function ChromeWrapper({ children, defaultOpen }: ChromeWrapperPr
             <DrawerProvider>
               {children}
               <DrawerOverlay />
+              <MobileBottomBar /> 
             </DrawerProvider>
           </SidebarInset>
         </SidebarProvider>
