@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react' // Usa tu icon pack favorito
+import { Expand, Shrink } from 'lucide-react'
 import clsx from 'clsx'
 
 export interface MobileCardProps<T extends Record<string, any>> {
@@ -30,31 +30,66 @@ export default function MobileCard<T extends Record<string, any>>({
 
   return (
     <div
-      className={clsx(
-        'rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-4 space-y-2',
-        'bg-white dark:bg-gray-900 transition-all'
-      )}
-    >
+  className={clsx(
+    'w-full rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-4 space-y-2',
+    'bg-white dark:bg-gray-900 transition-all'
+  )}
+>
       {/* Encabezado */}
-      <div
-        className='flex justify-between items-center cursor-pointer'
-        onClick={() => setCompact(!compact)}
-      >
-        <h3 className='font-semibold text-sm'>
+      <div className="flex justify-between items-center">
+        {/* Este es el área que podría abrir un drawer si lo deseas */}
+        <h3
+          className="font-semibold text-sm cursor-pointer"
+          onClick={() => {
+            // Aquí podrías llamar a una función como abrirDrawer()
+            console.log('Drawer abierto o acción externa');
+          }}
+        >
           {titleField ? String(data[titleField]) : 'Detalle'}
         </h3>
-        {compact ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+
+        {/* Solo este botón controla el expand/colapsar */}
+        <button
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+          onClick={(e) => {
+            e.stopPropagation()
+            setCompact(!compact)
+          }}
+        >
+          {compact ? <Expand size={18} /> : <Shrink size={18} />}
+        </button>
       </div>
 
       {/* Contenido */}
-      <div className={clsx(compact && 'hidden', 'text-xs')}>
-        {visibleEntries.map(([key, value]) => (
-          <div key={key} className='flex justify-between gap-2 py-[2px]'>
-            <span className='font-medium'>{key}:</span>
-            <span className='truncate'>{String(value ?? '—')}</span>
-          </div>
-        ))}
+      {/* Contenido estilo formulario: dos columnas en móvil, observaciones a ancho completo */}
+      <div
+        className={clsx(
+          compact && 'hidden',
+          'grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3 text-[13px] leading-tight w-full'
+        )}
+      >
+        {visibleEntries.map(([key, value]) => {
+          const isObservaciones = key.toLowerCase() === 'observaciones'
+          return (
+            <div
+              key={`entry-${key}`}
+              className={clsx(
+                'flex flex-col col-span-1',
+                isObservaciones && 'col-span-2 sm:col-span-3'
+              )}
+            >
+              <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium capitalize mb-0.5">
+                {key}:
+              </span>
+              <span className="text-[13px] text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words font-normal">
+                {String(value ?? '—')}
+              </span>
+            </div>
+          )
+        })}
       </div>
+
+
     </div>
   )
 }

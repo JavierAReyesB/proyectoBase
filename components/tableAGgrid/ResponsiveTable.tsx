@@ -43,7 +43,7 @@ export default function ResponsiveTable<T extends Record<string, any>>(
   } = props
 
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const gridRef    = useRef<AgGridReact<T>>(null)
+  const gridRef = useRef<AgGridReact<T>>(null)
 
   const [isMobile, setIsMobile] = useState(false)
 
@@ -72,12 +72,15 @@ export default function ResponsiveTable<T extends Record<string, any>>(
 
   if (isMobile) {
     return (
-      <div ref={wrapperRef} className="space-y-4">
+      <div
+        ref={wrapperRef}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-0 sm:px-2 md:px-4 w-full"
+      >
+
         {rowData.map((row, idx) => {
           const card = renderCard ? renderCard(row) : (
             <MobileCard data={row} {...mobileCardProps} />
           )
-          // si hay handler, envuelve en botón/div clickable
           return onRowClick ? (
             <div
               key={idx}
@@ -93,6 +96,7 @@ export default function ResponsiveTable<T extends Record<string, any>>(
       </div>
     )
   }
+
 
   return (
     <div

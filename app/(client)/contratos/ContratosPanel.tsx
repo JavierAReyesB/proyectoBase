@@ -21,9 +21,9 @@ import type { Proyecto } from './proyecto'
 
 
 const columnDefs: ColDef<Proyecto>[] = [
-  { field: 'id', headerName: 'ID', maxWidth: 90 },
-  { field: 'nombre', headerName: 'Proyecto', minWidth: 180 },
-  { field: 'cliente', headerName: 'Cliente', minWidth: 160 },
+  { field: 'id', headerName: 'ID', pinned: 'left', maxWidth: 70 },
+  { field: 'nombre', headerName: 'Proyecto',pinned: 'left', minWidth: 180 },
+  { field: 'cliente', headerName: 'Cliente', pinned: 'left',minWidth: 160 },
   {
     field: 'estado',
     headerName: 'Estado',
@@ -100,7 +100,7 @@ export default function ContratosPanel() {
     openDrawer({
       id: `contrato-${row.id}`,
       instanceId: `contrato-${row.id}`,
-      title: `Contrato: ${row.nombre}`,
+      title: 'Contratos', 
       width: 'half',
       isPinned: false,
       icon: null,
