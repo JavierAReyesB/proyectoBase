@@ -32,20 +32,29 @@ const mainNavigation = [
   { title: 'Trial Page', icon: BarChart2,      url: '/trialpage' }
 ]
 
-export function AppSidebar() {
-  const { state, isMobile } = useSidebar()
+/** 🧩 Componente reutilizable seguro: acepta `isMobileView` si no hay Provider */
+function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean }) {
+  let state = 'expanded'
+  let isMobile = isMobileView
+
+  // Intentamos usar el provider si está disponible
+  try {
+    const sidebar = useSidebar()
+    state = sidebar?.state ?? 'expanded'
+    isMobile = isMobileView || sidebar?.isMobile
+  } catch {
+    // No SidebarProvider: estamos probablemente en móvil/drawer
+  }
 
   return (
-    <Sidebar collapsible="icon" className="bg-[#1E293B] text-white">
-      {/* ---------- CONTENIDO PRINCIPAL ---------- */}
-      <SidebarContent className="bg-[#1E293B]">
+    <>
+      <SidebarContent className="bg-[#1E293B] text-white h-full">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={item.isActive}>
-                    {/* Usamos Link para navegación client‑side */}
                     <Link
                       href={item.url}
                       className={cn(
@@ -83,7 +92,6 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* ---------- FOOTER ---------- */}
       <SidebarFooter className="bg-[#1E293B]">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -121,9 +129,26 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+    </>
+  )
+}
 
-      {/* ---------- BOTÓN DE COLAPSO ---------- */}
-      <SidebarToggleButton />
+/** 🖥️ Sidebar de escritorio */
+export function AppSidebar() {
+  const { isMobile } = useSidebar()
+
+  return (
+    <Sidebar
+      collapsible="icon"
+      className="bg-[#1E293B] text-white hidden md:flex"
+    >
+      <SidebarContentInner />
+      {!isMobile && <SidebarToggleButton />}
     </Sidebar>
   )
+}
+
+/** 📱 Exportamos el contenido para drawer móvil */
+export function AppSidebarContentMobile() {
+  return <SidebarContentInner isMobileView />
 }
