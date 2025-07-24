@@ -14,7 +14,7 @@ const SidebarToggleBar: React.FC<Props> = ({ active, onToggle }) => {
     <>
       {/* 💬 FAB solo visible en móviles */}
       <div
-        className="fixed z-[9999] block md:hidden"
+        className="fixed z-[9999] block lg:hidden"
         style={{
           right: '1rem',
           bottom: 'calc(3.5rem + env(safe-area-inset-bottom))',
@@ -35,7 +35,7 @@ const SidebarToggleBar: React.FC<Props> = ({ active, onToggle }) => {
       {/* 💬 Barra vertical solo visible en escritorio */}
       <div
         className="
-          hidden md:flex
+          hidden lg:flex
           z-30 w-14 bg-[#1d2b44] text-white
           flex-col items-center py-4
           flex-shrink-0 h-full

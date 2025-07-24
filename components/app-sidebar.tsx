@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import {
@@ -23,27 +24,24 @@ import {
 } from '@/components/ui/sidebar'
 import { SidebarToggleButton } from './sidebar-toggle-button'
 
-/* Navegación principal */
 const mainNavigation = [
-  { title: 'Inicio',     icon: Home,           url: '/',           isActive: false },
-  { title: 'Usuarios',   icon: Users,          url: '/usuarios' },
-  { title: 'Contratos',  icon: Package,        url: '/contratos' },
-  { title: 'Dashboard',  icon: LayoutDashboard,url: '/dashboard' },
-  { title: 'Trial Page', icon: BarChart2,      url: '/trialpage' }
+  { title: 'Inicio', icon: Home, url: '/inicio' },
+  { title: 'Usuarios', icon: Users, url: '/usuarios' },
+  { title: 'Contratos', icon: Package, url: '/contratos' },
+  { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard' },
+  { title: 'Trial Page', icon: BarChart2, url: '/trialpage' }
 ]
 
-/** 🧩 Componente reutilizable seguro: acepta `isMobileView` si no hay Provider */
 function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean }) {
   let state = 'expanded'
   let isMobile = isMobileView
 
-  // Intentamos usar el provider si está disponible
   try {
     const sidebar = useSidebar()
     state = sidebar?.state ?? 'expanded'
     isMobile = isMobileView || sidebar?.isMobile
   } catch {
-    // No SidebarProvider: estamos probablemente en móvil/drawer
+    // No SidebarProvider
   }
 
   return (
@@ -54,7 +52,7 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
             <SidebarMenu>
               {mainNavigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.isActive}>
+                  <SidebarMenuButton asChild>
                     <Link
                       href={item.url}
                       className={cn(
@@ -133,22 +131,19 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
   )
 }
 
-/** 🖥️ Sidebar de escritorio */
+/** ✅ Sidebar de escritorio con media query, sin condicionales ni parpadeo */
 export function AppSidebar() {
-  const { isMobile } = useSidebar()
-
   return (
-    <Sidebar
-      collapsible="icon"
-      className="bg-[#1E293B] text-white hidden md:flex"
-    >
-      <SidebarContentInner />
-      {!isMobile && <SidebarToggleButton />}
-    </Sidebar>
+    <div className="hidden lg:flex">
+      <Sidebar collapsible="icon" className="bg-[#1E293B] text-white">
+        <SidebarContentInner />
+        <SidebarToggleButton />
+      </Sidebar>
+    </div>
   )
 }
 
-/** 📱 Exportamos el contenido para drawer móvil */
+/** 📱 Drawer móvil */
 export function AppSidebarContentMobile() {
   return <SidebarContentInner isMobileView />
 }
