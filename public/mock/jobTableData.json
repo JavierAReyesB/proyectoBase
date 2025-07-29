@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "fecha": "2025-07-21",
+    "sede": "Madrid Central",
+    "tipoTrabajo": "Inspección de equipos de refrigeración",
+    "servicio": "Revisión General",
+    "operario": "Carlos Ramírez",
+    "recomendaciones": "Revisar presión del sistema en próximas 48 horas.",
+    "resultado": "Riesgo Medio"
+  },
+  {
+    "id": 2,
+    "fecha": "2025-07-20",
+    "sede": "Barcelona Norte",
+    "tipoTrabajo": "Mantenimiento de aire acondicionado",
+    "servicio": "Mantenimiento Preventivo",
+    "operario": "Laura Martínez",
+    "recomendaciones": "Cambiar filtros antes de septiembre.",
+    "resultado": "Riesgo Nulo"
+  },
+  {
+    "id": 3,
+    "fecha": "2025-07-19",
+    "sede": "Valencia Este",
+    "tipoTrabajo": "Revisión de sistemas eléctricos",
+    "servicio": "Supervisión",
+    "operario": "Jorge Pérez",
+    "recomendaciones": "Ajustar voltajes de salida.",
+    "resultado": "Riesgo Grave"
+  },
+  {
+    "id": 4,
+    "fecha": "2025-07-18",
+    "sede": "Bilbao Centro",
+    "tipoTrabajo": "Instalación de luminarias LED",
+    "servicio": "Mejora Energética",
+    "operario": "Ana Gómez",
+    "recomendaciones": "Verificar intensidad lumínica.",
+    "resultado": "Riesgo Nulo"
+  },
+  {
+    "id": 5,
+    "fecha": "2025-07-17",
+    "sede": "Sevilla Sur",
+    "tipoTrabajo": "Inspección contra incendios",
+    "servicio": "Seguridad",
+    "operario": "Luis Torres",
+    "recomendaciones": "Reemplazar extintores vencidos.",
+    "resultado": "Riesgo Medio"
+  },
+  {
+    "id": 6,
+    "fecha": "2025-07-16",
+    "sede": "Zaragoza Norte",
+    "tipoTrabajo": "Revisión de ascensores",
+    "servicio": "Mantenimiento Correctivo",
+    "operario": "María Ruiz",
+    "recomendaciones": "Lubricar cables y poleas.",
+    "resultado": "Riesgo Nulo"
+  },
+  {
+    "id": 7,
+    "fecha": "2025-07-15",
+    "sede": "Granada Este",
+    "tipoTrabajo": "Inspección estructural",
+    "servicio": "Evaluación Técnica",
+    "operario": "Pedro Sánchez",
+    "recomendaciones": "Solicitar informe de ingeniería.",
+    "resultado": "Riesgo Grave"
+  },
+  {
+    "id": 8,
+    "fecha": "2025-07-14",
+    "sede": "Alicante Playa",
+    "tipoTrabajo": "Limpieza de paneles solares",
+    "servicio": "Energía Renovable",
+    "operario": "Lucía Fernández",
+    "recomendaciones": "Programar siguiente revisión en 3 meses.",
+    "resultado": "Riesgo Nulo"
+  },
+  {
+    "id": 9,
+    "fecha": "2025-07-13",
+    "sede": "Valladolid Norte",
+    "tipoTrabajo": "Verificación de alarmas",
+    "servicio": "Sistemas de Alarma",
+    "operario": "Juan López",
+    "recomendaciones": "Actualizar firmware del panel.",
+    "resultado": "Riesgo Medio"
+  },
+  {
+    "id": 10,
+    "fecha": "2025-07-12",
+    "sede": "Málaga Este",
+    "tipoTrabajo": "Instalación de climatizadores",
+    "servicio": "Mantenimiento Preventivo",
+    "operario": "Elena Navarro",
+    "recomendaciones": "Probar sistema en modo automático.",
+    "resultado": "Riesgo Nulo"
+  },
+  {
+    "id": 11,
+    "fecha": "2025-07-11",
+    "sede": "Santander Oeste",
+    "tipoTrabajo": "Control de plagas",
+    "servicio": "Higiene",
+    "operario": "Carlos Suárez",
+    "recomendaciones": "Refuerzo mensual recomendado.",
+    "resultado": "Riesgo Medio"
+  },
+  {
+    "id": 12,
+    "fecha": "2025-07-10",
+    "sede": "Murcia Norte",
+    "tipoTrabajo": "Auditoría ambiental",
+    "servicio": "Sostenibilidad",
+    "operario": "Marta León",
+    "recomendaciones": "Informar a responsables de residuos.",
+    "resultado": "Riesgo Nulo"
+  },
+  {
+    "id": 13,
+    "fecha": "2025-07-09",
+    "sede": "Pamplona Centro",
+    "tipoTrabajo": "Revisión de redes",
+    "servicio": "Infraestructura TI",
+    "operario": "Iván Gutiérrez",
+    "recomendaciones": "Cambiar switches antiguos.",
+    "resultado": "Riesgo Grave"
+  },
+  {
+    "id": 14,
+    "fecha": "2025-07-08",
+    "sede": "Logroño Industrial",
+    "tipoTrabajo": "Revisión de cámaras de seguridad",
+    "servicio": "Vigilancia",
+    "operario": "Nuria Salas",
+    "recomendaciones": "Limpiar lentes periódicamente.",
+    "resultado": "Riesgo Nulo"
+  },
+  {
+    "id": 15,
+    "fecha": "2025-07-07",
+    "sede": "Toledo Oeste",
+    "tipoTrabajo": "Revisión de calderas",
+    "servicio": "Calefacción",
+    "operario": "Francisco Molina",
+    "recomendaciones": "Revisar válvulas de presión.",
+    "resultado": "Riesgo Medio"
+  }
+]

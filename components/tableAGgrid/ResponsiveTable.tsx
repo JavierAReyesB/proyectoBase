@@ -11,7 +11,7 @@ import {
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community'
+import { ModuleRegistry, AllCommunityModule, GridOptions } from 'ag-grid-community'
 import MobileCard, { MobileCardProps } from '../tableAGgrid/MobileCard'
 
 ModuleRegistry.registerModules([AllCommunityModule])
@@ -22,11 +22,14 @@ interface ResponsiveTableProps<T extends Record<string, any>> {
   /** px a partir de los cuales pasamos a vista móvil (sobre el contenedor) */
   breakpoint?: number
   pagination?: boolean
+  paginationPageSize?: number
   /** Render prop para tarjetas móviles; si no se pasa, usa MobileCard */
   renderCard?: (row: T) => ReactNode
   mobileCardProps?: Omit<MobileCardProps<T>, 'data'>
   /** Callback que se dispara al hacer clic/seleccionar una fila */
   onRowClick?: (row: T) => void
+  /** GridOptions de AG Grid para extender comportamiento sin tocar el componente */
+  gridOptions?: GridOptions<T>
 }
 
 export default function ResponsiveTable<T extends Record<string, any>>(
@@ -35,11 +38,13 @@ export default function ResponsiveTable<T extends Record<string, any>>(
   const {
     columnDefs,
     rowData,
-    breakpoint = 640,
+    breakpoint = 840,
     pagination = true,
+    paginationPageSize,
     renderCard,
     mobileCardProps,
-    onRowClick
+    onRowClick,
+    gridOptions = {}
   } = props
 
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -59,15 +64,15 @@ export default function ResponsiveTable<T extends Record<string, any>>(
 
   const onGridReady = useCallback((params: any) => {
     params.api.sizeColumnsToFit()
-  }, [])
+    gridOptions?.onGridReady?.(params)
+  }, [gridOptions])
 
   const handleRowClicked = useCallback(
     (event: any) => {
-      if (onRowClick) {
-        onRowClick(event.data as T)
-      }
+      onRowClick?.(event.data as T)
+      gridOptions?.onRowClicked?.(event)
     },
-    [onRowClick]
+    [onRowClick, gridOptions]
   )
 
   if (isMobile) {
@@ -76,17 +81,12 @@ export default function ResponsiveTable<T extends Record<string, any>>(
         ref={wrapperRef}
         className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-0 sm:px-2 md:px-4 w-full"
       >
-
         {rowData.map((row, idx) => {
           const card = renderCard ? renderCard(row) : (
             <MobileCard data={row} {...mobileCardProps} />
           )
           return onRowClick ? (
-            <div
-              key={idx}
-              onClick={() => onRowClick(row)}
-              className="cursor-pointer"
-            >
+            <div key={idx} onClick={() => onRowClick(row)} className="cursor-pointer">
               {card}
             </div>
           ) : (
@@ -96,7 +96,6 @@ export default function ResponsiveTable<T extends Record<string, any>>(
       </div>
     )
   }
-
 
   return (
     <div
@@ -110,10 +109,10 @@ export default function ResponsiveTable<T extends Record<string, any>>(
         rowData={rowData}
         onGridReady={onGridReady}
         onRowClicked={handleRowClicked}
-        theme="legacy"
-        domLayout="autoHeight"
         pagination={pagination}
-        paginationAutoPageSize
+        paginationPageSize={paginationPageSize}
+        domLayout="autoHeight"
+        theme="legacy"
         defaultColDef={{
           flex: 1,
           resizable: true,
@@ -121,6 +120,7 @@ export default function ResponsiveTable<T extends Record<string, any>>(
           filter: true,
           minWidth: 120
         }}
+        {...gridOptions} // ⬅️ Permite extender opciones avanzadas
       />
     </div>
   )
