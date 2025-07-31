@@ -2,6 +2,14 @@
 
 import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
+import {
+  MessageCircle,
+  Settings,
+  HelpCircle,
+  Filter,
+  Zap
+} from 'lucide-react'
+
 import SidebarPanel from './SidebarPanel'
 import SidebarToggleBar from './SidebarToggleBar'
 import ChatPanel from './ChatPanel'
@@ -55,12 +63,12 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
 }
 
 
- const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
-  { key: 'chat', icon: '💬', label: 'Chat' },
-  { key: 'settings', icon: '⚙️', label: 'Configuración' },
-  { key: 'help', icon: '❓', label: 'Ayuda' },
-  { key: 'filters', icon: '🧮', label: 'Filtros' },
-  { key: 'actions', icon: '⚡', label: 'Acciones' } 
+const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
+  { key: 'chat', icon: <MessageCircle className="w-5 h-5" />, label: 'Chat' },
+  { key: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Configuración' },
+  { key: 'help', icon: <HelpCircle className="w-5 h-5" />, label: 'Ayuda' },
+  { key: 'filters', icon: <Filter className="w-5 h-5" />, label: 'Filtros' },
+  { key: 'actions', icon: <Zap className="w-5 h-5" />, label: 'Acciones' }
 ]
 
 
