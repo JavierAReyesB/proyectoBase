@@ -34,8 +34,8 @@ const mainNavigation = [
       { title: 'Trabajos', url: '/trabajos/ListadoTrabajos' },
       { title: 'Deficiencias', url: '/trabajos/ListadoDeficienciasCliente' },
       { title: 'Avisos', url: '/trabajos/ListadoAvisos' },
-      { title: 'Inventario Puntos de Control', url: '/inventario-puntos' },
-      { title: 'Plan de Trabajo', url: '/plan-trabajo' }
+      { title: 'Inventario Puntos de Control', url: '/trabajos/ListadoPuntos' },
+      { title: 'Plan de Trabajo', url: '/trabajos/ListadoPlanTrabajo' }
     ]
   },
   {

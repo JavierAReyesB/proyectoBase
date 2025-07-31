@@ -1,17 +1,17 @@
 'use client'
 
 import React, { useState } from 'react'
-import type { Punto } from '../services/api'
+import type { PlanTrabajo } from '../services/api'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 
 interface Props {
-  data: Punto
+  data: PlanTrabajo
 }
 
-export function PuntosFormulario({ data }: Props) {
+export function PlanTrabajoFormulario({ data }: Props) {
   const [form, setForm] = useState({
     sede: data.sede,
     tipoTrabajo: data.tipoTrabajo,
@@ -26,13 +26,13 @@ export function PuntosFormulario({ data }: Props) {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Guardar cambios:', form)
+    console.log('Guardar cambios en plan de trabajo:', form)
     // Aquí tu llamada a la API …
   }
 
   return (
     <form onSubmit={submit} className="w-full space-y-6">
-      <h3 className="text-lg font-semibold">Editar Punto</h3>
+      <h3 className="text-lg font-semibold">Editar Plan de Trabajo</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
         <div>
@@ -40,7 +40,7 @@ export function PuntosFormulario({ data }: Props) {
           <Input value={form.sede} onChange={handle('sede')} />
         </div>
         <div>
-          <Label>Tipo de Trabajo</Label>
+          <Label>Tipo de Trabajo</Label>
           <Input value={form.tipoTrabajo} onChange={handle('tipoTrabajo')} />
         </div>
         <div>
@@ -66,7 +66,7 @@ export function PuntosFormulario({ data }: Props) {
         <Button type="button" variant="ghost">
           Cancelar
         </Button>
-        <Button type="submit">Guardar cambios</Button>
+        <Button type="submit">Guardar cambios</Button>
       </div>
     </form>
   )

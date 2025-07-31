@@ -1,17 +1,17 @@
-// ListadoAvisos/columns.tsx
+// ListadoPlanTrabajo/columnsPlanTrabajo.ts
 import clsx from 'clsx'
 import { Download, Eye, AlertTriangle } from 'lucide-react'
 import { ColDef } from 'ag-grid-community'
 
-// Define estilos para los valores de "resultado"
-const resultadosBadge: Record<string, string> = {
+// Define los posibles resultados y sus clases
+const resultadoBadgeColor: Record<string, string> = {
   'Riesgo Nulo': 'bg-gray-300 text-gray-800',
   'Riesgo Medio': 'bg-yellow-300 text-yellow-900',
   'Riesgo Grave': 'bg-red-500 text-white',
 }
 
-// Columnas para la tabla de avisos
-export const puntosTableColumns: ColDef[] = [
+// Columnas tipadas correctamente para el listado de Planes de Trabajo
+export const planTrabajoColumns: ColDef[] = [
   { headerName: 'Fecha', field: 'fecha' },
   { headerName: 'Sede', field: 'sede' },
   { headerName: 'Tipo de Trabajo', field: 'tipoTrabajo' },
@@ -41,7 +41,7 @@ export const puntosTableColumns: ColDef[] = [
       <span
         className={clsx(
           'text-xs font-semibold px-2 py-1 rounded-full',
-          resultadosBadge[params.value] || 'bg-gray-200 text-gray-800'
+          resultadoBadgeColor[params.value] || 'bg-gray-200 text-gray-800'
         )}
       >
         {params.value}

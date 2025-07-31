@@ -1,0 +1,64 @@
+{
+  "contratos": [
+    {
+      "id": "284180",
+      "periodo": "01/07/2025 - 30/06/2026",
+      "servicio": "Servicios de higiene"
+    },
+    {
+      "id": "284179",
+      "periodo": "01/07/2025 - 30/06/2026",
+      "servicio": "Informe Diagnostico, Ptos. inspección. Insectos arrastrantes, Ptos. inspección. Roedores"
+    },
+    {
+      "id": "284178",
+      "periodo": "01/07/2025 - 30/06/2026",
+      "servicio": "Insectocutores"
+    },
+    {
+      "id": "241676",
+      "periodo": "01/07/2024 - 30/06/2025",
+      "servicio": "Desinsectación Tto. de Plagas, Informe Diagnostico, Ptos. inspección. Insectos arrastrantes, Ptos. inspección. Roedores"
+    },
+    {
+      "id": "241675",
+      "periodo": "01/07/2024 - 30/06/2025",
+      "servicio": "Desinsectación Tto. de Plagas, Insectocutores"
+    },
+    {
+      "id": "241674",
+      "periodo": "01/07/2024 - 30/06/2025",
+      "servicio": "Servicios de higiene"
+    },
+    {
+      "id": "233953",
+      "periodo": "01/05/2024 - 01/05/2025",
+      "servicio": "Servicios de higiene"
+    },
+    {
+      "id": "227868",
+      "periodo": "01/03/2024 - 01/03/2025",
+      "servicio": "Desinsectación Tto. de Plagas, Informe Diagnostico, Ptos. inspección. Insectos arrastrantes, Ptos. inspección. Roedores"
+    },
+    {
+      "id": "227491",
+      "periodo": "01/03/2024 - 01/03/2025",
+      "servicio": "Insectocutores, Otros Trabajos"
+    },
+    {
+      "id": "206179",
+      "periodo": "01/05/2023 - 30/04/2024",
+      "servicio": "Servicios de higiene"
+    },
+    {
+      "id": "190710",
+      "periodo": "01/03/2023 - 29/02/2024",
+      "servicio": "Insectocutores"
+    },
+    {
+      "id": "190709",
+      "periodo": "01/03/2023 - 29/02/2024",
+      "servicio": "Insectocutores, Ptos. inspección. Insectos arrastrantes, Ptos. inspección. Roedores"
+    }
+  ]
+}

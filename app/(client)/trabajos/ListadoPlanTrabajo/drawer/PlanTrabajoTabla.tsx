@@ -1,32 +1,48 @@
 'use client'
 
 import React from 'react'
-import type { Punto } from '../services/api'
+import type { PlanTrabajo } from '../services/api'
 import { Download, AlertTriangle, Eye } from 'lucide-react'
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
 
 interface Props {
-  data: Punto
+  data: PlanTrabajo
 }
 
-export function PuntosTabla({ data }: Props) {
+export function PlanTrabajoTabla({ data }: Props) {
   const columnDefs = [
     { field: 'fecha', headerName: 'Fecha' },
     { field: 'sede', headerName: 'Sede' },
     { field: 'tipoTrabajo', headerName: 'Tipo de Trabajo' },
     { field: 'servicio', headerName: 'Servicio' },
-    { field: 'operario', headerName: 'Operario' },
     {
-      field: 'recomendaciones',
-      headerName: 'Recomendaciones',
+      field: 'operario',
+      headerName: 'Operario',
       cellRenderer: (p: { value: string }) => (
-        <div className="truncate max-w-[200px]" title={p.value}>
+        <span className="text-blue-600 underline cursor-pointer hover:text-blue-800">
           {p.value}
-        </div>
-      ),
+        </span>
+      )
     },
-    { field: 'resultado', headerName: 'Resultado' },
-    { field: 'prioridad', headerName: 'Prioridad' },
+    { field: 'recomendaciones', headerName: 'Recomendaciones' },
+    {
+      field: 'resultado',
+      headerName: 'Resultado',
+      cellRenderer: (p: { value: string }) => {
+        const v = p.value
+        const color =
+          v === 'Riesgo Grave'
+            ? 'bg-red-500 text-white'
+            : v === 'Riesgo Medio'
+            ? 'bg-yellow-400 text-black'
+            : 'bg-gray-300 text-gray-800'
+        return (
+          <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${color}`}>
+            {v}
+          </span>
+        )
+      }
+    },
     {
       headerName: 'Documentos',
       cellRenderer: () => (
@@ -35,14 +51,14 @@ export function PuntosTabla({ data }: Props) {
           <AlertTriangle className="h-4 w-4 cursor-pointer hover:text-yellow-600" />
           <Eye className="h-4 w-4 cursor-pointer hover:text-blue-600" />
         </div>
-      ),
-    },
+      )
+    }
   ]
 
   return (
     <div className="w-full space-y-4">
       <h3 className="text-lg font-semibold">
-        Detalle del Punto&nbsp;#{data.id}
+        Detalle del Plan de Trabajo&nbsp;#{data.id}
       </h3>
 
       <ResponsiveTable
