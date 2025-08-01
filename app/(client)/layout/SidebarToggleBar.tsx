@@ -44,7 +44,7 @@ const SidebarToggleBar: React.FC<Props> = ({ active, onToggle, buttons = [] }) =
       )}
 
       {/* 🖥️ Barra lateral en escritorio con múltiples botones */}
-      <div className="hidden lg:flex z-30 w-14 bg-[#1d2b44] text-white flex-col items-center py-4 flex-shrink-0 h-full space-y-6">
+      <div className="hidden lg:flex z-30 w-12 bg-[#1d2b44] text-white flex-col items-center py-4 flex-shrink-0 h-full space-y-6">
         {buttons.map(({ key, icon, label }) => (
           <button
             key={key}

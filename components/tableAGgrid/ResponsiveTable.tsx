@@ -79,7 +79,7 @@ export default function ResponsiveTable<T extends Record<string, any>>(
     return (
       <div
         ref={wrapperRef}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-0 sm:px-2 md:px-4 w-full"
+        className="grid grid-cols-1 gap-4 px-0 sm:px-2 md:px-4 w-full"
       >
         {rowData.map((row, idx) => {
           const card = renderCard ? renderCard(row) : (
