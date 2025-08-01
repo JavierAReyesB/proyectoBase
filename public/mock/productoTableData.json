@@ -1,0 +1,154 @@
+[
+  {
+  "id": 100,
+  "foto": "/mock/img/productoprueba.png",
+  "nombreProducto": "Producto Test Imagen Real",
+  "registro": "REG-9998",
+  "materiaActiva": "Mock Real",
+  "tipoProducto": "Test",
+  "estado": "Activo",
+  "sede": "Test Center"
+}
+
+,
+  {
+    "id": 2,
+    "foto": "/mock/img/producto2.jpg",
+    "nombreProducto": "Limpiador Clorado",
+    "registro": "REG-1002",
+    "materiaActiva": "Cloruro de benzalconio 0.1%",
+    "tipoProducto": "Detergente",
+    "estado": "Inactivo",
+    "sede": "Granada Este"
+  },
+  {
+    "id": 3,
+    "foto": "/mock/img/producto3.jpg",
+    "nombreProducto": "Desinfectante X200",
+    "registro": "REG-1003",
+    "materiaActiva": "Peróxido de hidrógeno 3%",
+    "tipoProducto": "Desinfectante",
+    "estado": "Pendiente",
+    "sede": "Madrid Central"
+  },
+  {
+    "id": 4,
+    "foto": "/mock/img/producto4.jpg",
+    "nombreProducto": "Detergente Enzimático",
+    "registro": "REG-1004",
+    "materiaActiva": "Etanol 70%",
+    "tipoProducto": "Detergente",
+    "estado": "Activo",
+    "sede": "Valladolid Norte"
+  },
+  {
+    "id": 5,
+    "foto": "/mock/img/producto5.jpg",
+    "nombreProducto": "Bactericida ProClean",
+    "registro": "REG-1005",
+    "materiaActiva": "Amonio cuaternario 0.2%",
+    "tipoProducto": "Fungicida",
+    "estado": "Activo",
+    "sede": "Zaragoza Norte"
+  },
+  {
+    "id": 6,
+    "foto": "/mock/img/producto6.jpg",
+    "nombreProducto": "Limpiador Clorado",
+    "registro": "REG-1006",
+    "materiaActiva": "Hipoclorito sódico 5%",
+    "tipoProducto": "Limpiador",
+    "estado": "Inactivo",
+    "sede": "Barcelona Norte"
+  },
+  {
+    "id": 7,
+    "foto": "/mock/img/producto7.jpg",
+    "nombreProducto": "Gel Hidroalcohólico Pure",
+    "registro": "REG-1007",
+    "materiaActiva": "Isopropanol 75%",
+    "tipoProducto": "Desinfectante",
+    "estado": "Pendiente",
+    "sede": "Málaga Este"
+  },
+  {
+    "id": 8,
+    "foto": "/mock/img/producto8.jpg",
+    "nombreProducto": "Virucida TotalGuard",
+    "registro": "REG-1008",
+    "materiaActiva": "NaOH 1%",
+    "tipoProducto": "Virucida",
+    "estado": "Activo",
+    "sede": "Valencia Este"
+  },
+  {
+    "id": 9,
+    "foto": "/mock/img/producto9.jpg",
+    "nombreProducto": "Fungicida EcoSafe",
+    "registro": "REG-1009",
+    "materiaActiva": "Etanol 70%",
+    "tipoProducto": "Fungicida",
+    "estado": "Inactivo",
+    "sede": "Sevilla Sur"
+  },
+  {
+    "id": 10,
+    "foto": "/mock/img/producto10.jpg",
+    "nombreProducto": "Desengrasante Industrial",
+    "registro": "REG-1010",
+    "materiaActiva": "Peróxido de hidrógeno 3%",
+    "tipoProducto": "Limpiador",
+    "estado": "Activo",
+    "sede": "Alicante Playa"
+  },
+  {
+    "id": 11,
+    "foto": "/mock/img/producto11.jpg",
+    "nombreProducto": "Limpiador Multiusos Z",
+    "registro": "REG-1011",
+    "materiaActiva": "Isopropanol 75%",
+    "tipoProducto": "Detergente",
+    "estado": "Pendiente",
+    "sede": "Madrid Central"
+  },
+  {
+    "id": 12,
+    "foto": "/mock/img/producto12.jpg",
+    "nombreProducto": "Desinfectante X200",
+    "registro": "REG-1012",
+    "materiaActiva": "Cloruro de benzalconio 0.1%",
+    "tipoProducto": "Desinfectante",
+    "estado": "Activo",
+    "sede": "Toledo Oeste"
+  },
+  {
+    "id": 13,
+    "foto": "/mock/img/producto13.jpg",
+    "nombreProducto": "Gel Hidroalcohólico Pure",
+    "registro": "REG-1013",
+    "materiaActiva": "Etanol 70%",
+    "tipoProducto": "Virucida",
+    "estado": "Inactivo",
+    "sede": "Pamplona Centro"
+  },
+  {
+    "id": 14,
+    "foto": "/mock/img/producto14.jpg",
+    "nombreProducto": "Virucida TotalGuard",
+    "registro": "REG-1014",
+    "materiaActiva": "Hipoclorito sódico 5%",
+    "tipoProducto": "Virucida",
+    "estado": "Activo",
+    "sede": "Murcia Norte"
+  },
+  {
+    "id": 15,
+    "foto": "/mock/img/producto15.jpg",
+    "nombreProducto": "Desengrasante Industrial",
+    "registro": "REG-1015",
+    "materiaActiva": "NaOH 1%",
+    "tipoProducto": "Limpiador",
+    "estado": "Activo",
+    "sede": "Santander Oeste"
+  }
+]

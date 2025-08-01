@@ -1,25 +1,26 @@
 'use client'
 
 import { useState } from 'react'
-import { Expand, Shrink } from 'lucide-react'
+import { Expand, Shrink, MapPin, FileText } from 'lucide-react'
 import clsx from 'clsx'
+import Image from 'next/image'
+import { Badge } from '@/components/ui/badge'
 
 export interface MobileCardProps<T extends Record<string, any>> {
-  /** Objeto con todos los datos de la fila */
   data: T
-  /** Clave cuyo valor se mostrará como título en modo compacto */
   titleField?: keyof T
-  /** Campos que NO deseas mostrar */
   hiddenFields?: (keyof T)[]
-  /** Si parte en modo compacto */
+  collapsedFields?: (keyof T)[] // <- nuevo: qué mostrar en contraído
+  expandedFieldOrder?: (keyof T)[] // <- nuevo: orden personalizado
   defaultCompact?: boolean
 }
 
-/** Tarjeta genérica, no acoplada a “pagos” ni a ningún dominio. */
 export default function MobileCard<T extends Record<string, any>>({
   data,
   titleField,
   hiddenFields = [],
+  collapsedFields = [], // si no defines nada, no muestra extra en contraído
+  expandedFieldOrder,
   defaultCompact = true
 }: MobileCardProps<T>) {
   const [compact, setCompact] = useState(defaultCompact)
@@ -28,68 +29,127 @@ export default function MobileCard<T extends Record<string, any>>({
     ([key]) => !hiddenFields.includes(key as keyof T)
   )
 
-  return (
-    <div
-  className={clsx(
-    'w-full rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-4 space-y-2',
-    'bg-white dark:bg-gray-900 transition-all'
-  )}
->
-      {/* Encabezado */}
-      <div className="flex justify-between items-center">
-        {/* Este es el área que podría abrir un drawer si lo deseas */}
-        <h3
-          className="font-semibold text-sm cursor-pointer"
-          onClick={() => {
-            // Aquí podrías llamar a una función como abrirDrawer()
-            console.log('Drawer abierto o acción externa');
-          }}
-        >
-          {titleField ? String(data[titleField]) : 'Detalle'}
-        </h3>
+  const isImage = (val: any) =>
+    typeof val === 'string' && /\.(jpg|jpeg|png|webp|gif|svg)$/.test(val)
 
-        {/* Solo este botón controla el expand/colapsar */}
+  const isBadgeField = (key: string) =>
+    ['estado', 'tipoProducto', 'status', 'category', 'type'].includes(
+      key.toLowerCase()
+    )
+
+  // Reordenar según expandedFieldOrder si está definido
+  const orderedEntries = expandedFieldOrder
+    ? expandedFieldOrder
+        .map((field) => visibleEntries.find(([k]) => k === field))
+        .filter(Boolean) as [string, any][]
+    : visibleEntries
+
+  return (
+    <div className="w-full rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 shadow-sm transition-all hover:shadow-md">
+      {/* Encabezado */}
+      <div className="p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Imagen pequeña */}
+          {isImage(data?.foto) && (
+            <Image
+              src={String(data.foto)}
+              alt={titleField ? String(data[titleField]) : 'Imagen'}
+              width={48}
+              height={48}
+              className="rounded-lg object-cover border"
+              onError={(e) => {
+                e.currentTarget.src = '/mock/img/productoprueba.png'
+              }}
+            />
+          )}
+
+          <div className="flex-1 min-w-0">
+            <h3
+              className="font-semibold text-sm text-gray-900 truncate dark:text-gray-100 cursor-pointer"
+              onClick={() => console.log('Drawer abierto o acción externa')}
+            >
+              {titleField ? String(data[titleField]) : 'Detalle'}
+            </h3>
+
+            {/* Mostrar collapsedFields */}
+            {collapsedFields.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                {collapsedFields.map((field) =>
+                  data[field] ? (
+                    <span
+                      key={String(field)}
+                      className="text-xs text-gray-500 flex items-center gap-1 truncate"
+                    >
+                      {String(data[field])}
+                    </span>
+                  ) : null
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Botón expandir/contraer */}
         <button
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition"
           onClick={(e) => {
             e.stopPropagation()
             setCompact(!compact)
           }}
         >
-          {compact ? <Expand size={18} /> : <Shrink size={18} />}
+          {compact ? (
+            <Expand size={18} className="text-gray-500 dark:text-gray-400" />
+          ) : (
+            <Shrink size={18} className="text-gray-500 dark:text-gray-400" />
+          )}
         </button>
       </div>
 
-      {/* Contenido */}
-      {/* Contenido estilo formulario: dos columnas en móvil, observaciones a ancho completo */}
-      <div
-        className={clsx(
-          compact && 'hidden',
-          'grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3 text-[13px] leading-tight w-full'
-        )}
-      >
-        {visibleEntries.map(([key, value]) => {
-          const isObservaciones = key.toLowerCase() === 'observaciones'
-          return (
-            <div
-              key={`entry-${key}`}
-              className={clsx(
-                'flex flex-col col-span-1',
-                isObservaciones && 'col-span-2 sm:col-span-3'
-              )}
-            >
-              <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium capitalize mb-0.5">
-                {key}:
-              </span>
-              <span className="text-[13px] text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words font-normal">
-                {String(value ?? '—')}
-              </span>
-            </div>
-          )
-        })}
-      </div>
+      {/* Contenido expandido */}
+      {!compact && (
+        <div className="border-t bg-gray-50/50 dark:bg-gray-800/40 p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+            {orderedEntries.map(([key, value]) => {
+              const isObservaciones = key.toLowerCase() === 'observaciones'
 
+              return (
+                <div
+                  key={`entry-${key}`}
+                  className={clsx(
+                    'flex flex-col',
+                    isObservaciones && 'col-span-2 sm:col-span-3'
+                  )}
+                >
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    {key}
+                  </span>
 
+                  {isImage(value) ? (
+                    <Image
+                      src={String(value)}
+                      alt={key}
+                      width={120}
+                      height={120}
+                      className="rounded-lg object-cover border shadow-sm"
+                      onError={(e) => {
+                        e.currentTarget.src = '/mock/img/productoprueba.png'
+                      }}
+                    />
+                  ) : isBadgeField(key) ? (
+                    <Badge variant="outline" className="bg-gray-100">
+                      {String(value ?? '—')}
+                    </Badge>
+                  ) : (
+                    <span className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
+                      {String(value ?? '—')}
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

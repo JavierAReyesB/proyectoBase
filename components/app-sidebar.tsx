@@ -39,6 +39,14 @@ const mainNavigation = [
     ]
   },
   {
+    title: 'Documentación',
+    icon: Package, // Puedes cambiar el ícono si deseas uno más representativo
+    children: [
+      { title: 'Productos', url: '/documentacion/ListadoProductos' }
+    ]
+  },
+
+  {
     title: 'Contratos',
     icon: Package,
     children: [
@@ -119,8 +127,8 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
                           ? 'w-[--sidebar-width-icon] px-2 overflow-hidden'
                           : 'w-full px-2',
                         state === 'collapsed' &&
-                          !isMobile &&
-                          'group-hover:w-full group-hover:px-2'
+                        !isMobile &&
+                        'group-hover:w-full group-hover:px-2'
                       )}
                     >
                       <item.icon className="size-4 shrink-0 text-white" />
@@ -132,8 +140,8 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
                             ? 'max-w-0 opacity-0'
                             : 'max-w-[200px] opacity-100',
                           state === 'collapsed' &&
-                            !isMobile &&
-                            'group-hover:max-w-[200px] group-hover:opacity-100'
+                          !isMobile &&
+                          'group-hover:max-w-[200px] group-hover:opacity-100'
                         )}
                       >
                         {item.title}
@@ -167,8 +175,8 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
                             ? 'w-[--sidebar-width-icon] px-2 overflow-hidden'
                             : 'w-full px-2',
                           state === 'collapsed' &&
-                            !isMobile &&
-                            'group-hover:w-full group-hover:px-2'
+                          !isMobile &&
+                          'group-hover:w-full group-hover:px-2'
                         )}
                       >
                         <item.icon className="size-4 shrink-0 text-white" />
@@ -180,8 +188,8 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
                               ? 'max-w-0 opacity-0'
                               : 'max-w-[200px] opacity-100',
                             state === 'collapsed' &&
-                              !isMobile &&
-                              'group-hover:max-w-[200px] group-hover:opacity-100'
+                            !isMobile &&
+                            'group-hover:max-w-[200px] group-hover:opacity-100'
                           )}
                         >
                           {item.title}
@@ -209,8 +217,8 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
                     ? 'w-[--sidebar-width-icon] px-2 overflow-hidden'
                     : 'w-full px-2',
                   state === 'collapsed' &&
-                    !isMobile &&
-                    'group-hover:w-full group-hover:px-2'
+                  !isMobile &&
+                  'group-hover:w-full group-hover:px-2'
                 )}
               >
                 <Settings className="size-4 shrink-0 text-white" />
@@ -222,8 +230,8 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
                       ? 'max-w-0 opacity-0'
                       : 'max-w-[200px] opacity-100',
                     state === 'collapsed' &&
-                      !isMobile &&
-                      'group-hover:max-w-[200px] group-hover:opacity-100'
+                    !isMobile &&
+                    'group-hover:max-w-[200px] group-hover:opacity-100'
                   )}
                 >
                   Avanzadi

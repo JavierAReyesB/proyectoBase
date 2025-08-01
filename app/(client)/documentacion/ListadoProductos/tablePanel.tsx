@@ -3,25 +3,24 @@
 import React, { useEffect, useState } from 'react'
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
 import {
-  fetchDeficiencias,
-  fetchSedesDef,
-  fetchTiposServicioDef,
-  fetchCategoriasDef,
-  Deficiencia
+  fetchProductos,
+  fetchSedesProducto,
+  fetchTiposServicioProducto,
+  fetchCategoriasProducto,
+  Producto
 } from './services/api'
-import { jobTableColumns } from './columns'
-import JobTableFilters from './tablefilters'
+import { productoTableColumns } from './columns'
+import JobTableFilters from './tableFilters'
 import { useDrawerContext } from '@/components/drawer/DrawerProvider'
-import { DeficienciaDrawer } from './drawer/DeficienciaDrawer'
-
+import { ProductoDrawer } from './drawer/ProductoDrawer'
 
 interface TipoServicio {
   nombre: string
   activo: boolean
 }
 
-export const DeficienciaTablePanel: React.FC = () => {
-  const [rowData, setRowData] = useState<Deficiencia[]>([])
+export const ProductoTablePanel: React.FC = () => {
+  const [rowData, setRowData] = useState<Producto[]>([])
   const [sedes, setSedes] = useState<string[]>([])
   const [tiposServicio, setTiposServicio] = useState<TipoServicio[]>([])
   const [selectedSede, setSelectedSede] = useState<string>('')
@@ -31,38 +30,35 @@ export const DeficienciaTablePanel: React.FC = () => {
   const [categorias, setCategorias] = useState<string[]>([])
   const [selectedCategoria, setSelectedCategoria] = useState<string>('todas')
 
-
   const { openDrawer } = useDrawerContext()
 
   useEffect(() => {
-    fetchDeficiencias().then(setRowData)
+    fetchProductos().then(setRowData)
   }, [])
 
   useEffect(() => {
-    fetchSedesDef().then(setSedes)
+    fetchSedesProducto().then(setSedes)
   }, [])
 
   useEffect(() => {
-    fetchTiposServicioDef().then(setTiposServicio)
+    fetchTiposServicioProducto().then(setTiposServicio)
   }, [])
 
   useEffect(() => {
-    fetchCategoriasDef().then(setCategorias)
+    fetchCategoriasProducto().then(setCategorias)
   }, [])
 
-
-  const handleRowClick = (row: Deficiencia) => {
+  const handleRowClick = (row: Producto) => {
     openDrawer({
-      id: `deficiencia-${row.id}`,
-      instanceId: `deficiencia-${row.id}`,
-      title: `Deficiencia #${row.id}`,
+      id: `producto-${row.id}`,
+      instanceId: `producto-${row.id}`,
+      title: `Producto #${row.id}`,
       width: 'half',
       isPinned: false,
       icon: null,
-      contentKey: 'deficiencia',
-      contentData: row,
-      content: <DeficienciaDrawer data={row} />
-
+      contentKey: 'producto',
+      contentData: row, 
+      content: <ProductoDrawer data={row} /> 
     })
   }
 
@@ -71,13 +67,12 @@ export const DeficienciaTablePanel: React.FC = () => {
       {/* Encabezado */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-x-4 mb-4">
         <h1 className="text-2xl sm:text-3xl font-light text-slate-800 tracking-wide">
-          Panel de Deficiencias
+          Panel de Productos
         </h1>
         <p className="text-slate-600 font-light text-sm sm:text-base">
-          Listado y seguimiento de riesgos detectados
+          Listado de productos registrados y en uso
         </p>
       </div>
-
 
       {/* Panel principal */}
       <div className="bg-white rounded-md shadow-md p-4 space-y-6">
@@ -97,29 +92,26 @@ export const DeficienciaTablePanel: React.FC = () => {
           setShowRecords={setShowRecords}
         />
 
-
         <ResponsiveTable
-          columnDefs={jobTableColumns}
+          columnDefs={productoTableColumns}
           rowData={rowData}
           pagination
           paginationPageSize={parseInt(showRecords)}
           breakpoint={1024}
           onRowClick={handleRowClick}
           mobileCardProps={{
-            titleField: 'tipoTrabajo',
+            titleField: 'nombreProducto',
+            collapsedFields: ['registro', 'sede'],
             hiddenFields: ['id'],
-            collapsedFields: ['fecha', 'sede'],
             expandedFieldOrder: [
-              'fecha',
+              'registro',
               'sede',
-              'tipoTrabajo',
-              'servicio',
-              'operario',
-              'resultado',
-              'recomendaciones'
+              'materiaActiva',
+              'tipoProducto',
+              'estado',
+              'foto'
             ]
           }}
-
         />
 
         <div className="text-sm text-gray-600 mt-4">
