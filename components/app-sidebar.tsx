@@ -40,22 +40,22 @@ const mainNavigation = [
   },
   {
     title: 'Documentación',
-    icon: Package, // Puedes cambiar el ícono si deseas uno más representativo
+    icon: Package, 
     children: [
       { title: 'Productos', url: '/documentacion/ListadoProductos' }
     ]
   },
 
-  {
-    title: 'Contratos',
-    icon: Package,
-    children: [
-      { title: 'Listado', url: '/contratos' },
-      { title: 'Nuevo Contrato', url: '/contratos/nuevo' }
-    ]
-  },
+  // {
+  //   title: 'Contratos',
+  //   icon: Package,
+  //   children: [
+  //     { title: 'Listado', url: '/contratos' },
+  //     { title: 'Nuevo Contrato', url: '/contratos/nuevo' }
+  //   ]
+  // },
   { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'Trial Page', icon: BarChart2, url: '/trialpage' }
+  
 ]
 
 function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean }) {
@@ -71,18 +71,26 @@ function SidebarContentInner({ isMobileView = false }: { isMobileView?: boolean 
     state = sidebar?.state ?? 'expanded'
     isMobile = isMobileView || sidebar?.isMobile
   } catch {
-    // No SidebarProvider
+    
   }
 
-  useEffect(() => {
-    const newOpenMenus: Record<string, boolean> = {}
-    mainNavigation.forEach((item) => {
-      if (item.children?.some((child) => pathname?.startsWith(child.url))) {
-        newOpenMenus[item.title] = true
-      }
-    })
-    setOpenMenus((prev) => ({ ...prev, ...newOpenMenus }))
-  }, [pathname])
+  /* Abre / cierra sub-menús al cambiar de ruta -------------------------- */
+useEffect(() => {
+
+  if (state === 'collapsed' && !isMobile) {
+    setOpenMenus({})
+    return
+  }
+
+  const newOpen: Record<string, boolean> = {}
+  mainNavigation.forEach(item => {
+    if (item.children?.some(child => pathname?.startsWith(child.url))) {
+      newOpen[item.title] = true
+    }
+  })
+  setOpenMenus(prev => ({ ...prev, ...newOpen }))
+}, [pathname, state, isMobile])
+
 
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
