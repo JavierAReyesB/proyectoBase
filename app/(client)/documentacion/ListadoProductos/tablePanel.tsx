@@ -51,8 +51,8 @@ export const ProductoTablePanel: React.FC = () => {
   const handleRowClick = (row: Producto) => {
     openDrawer({
       id: `producto-${row.id}`,
-      instanceId: `producto-${row.id}`,
-      title: `Producto #${row.id}`,
+      instanceId: `Producto-${row.id}`,
+      title: `Productos`,
       width: 'half',
       isPinned: false,
       icon: null,

@@ -97,8 +97,7 @@ export function MinimizedDrawersBar({
                   )}
                   <span className='truncate'>{title}</span>
                   <Badge
-                    variant='secondary'
-                    className='ml-auto px-2 py-0.5 text-xs'
+                    className="bg-[hsl(var(--muted))] text-[hsl(var(--muted-foreground))] ml-auto px-2 py-0.5 text-xs"
                   >
                     {count}
                   </Badge>

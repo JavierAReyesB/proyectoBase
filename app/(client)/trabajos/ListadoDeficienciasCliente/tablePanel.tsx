@@ -52,19 +52,19 @@ export const DeficienciaTablePanel: React.FC = () => {
 
 
   const handleRowClick = (row: Deficiencia) => {
-    openDrawer({
-      id: `deficiencia-${row.id}`,
-      instanceId: `deficiencia-${row.id}`,
-      title: `Deficiencia #${row.id}`,
-      width: 'half',
-      isPinned: false,
-      icon: null,
-      contentKey: 'deficiencia',
-      contentData: row,
-      content: <DeficienciaDrawer data={row} />
+  openDrawer({
+    id: `deficiencia-${row.id}`,
+    instanceId: `deficiencia-${row.id}`,
+    title: `Deficiencia`, // ✅ igual para todos
+    width: 'half',
+    isPinned: false,
+    icon: null,
+    contentKey: 'deficiencia',
+    contentData: row,
+    content: <DeficienciaDrawer data={row} />
+  })
+}
 
-    })
-  }
 
   return (
     <div className="space-y-6 px-2 sm:px-4 md:px-6 py-6">

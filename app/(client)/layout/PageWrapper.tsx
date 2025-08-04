@@ -81,6 +81,10 @@ const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
 
       {/* CONTENIDO PRINCIPAL */}
       <main
+      style={{
+    scrollbarWidth: 'none', // Firefox
+    msOverflowStyle: 'none' // IE/Edge
+  }}
         className={cn(
           'flex-1 overflow-y-auto max-h-[90dvh] md:max-h-screen pb-32 md:pb-0 transition-all duration-300 z-10',
           className
@@ -96,6 +100,7 @@ const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
             </div>
           )}
           {children}
+           <div className="h-16" />
         </div>
       </main>
 
