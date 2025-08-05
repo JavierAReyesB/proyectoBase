@@ -17,6 +17,7 @@ import SettingsPanel from './SettingsPanel'
 import HelpPanel from './HelpPanel'         
 import FiltersPanel from './FiltersPanel'
 import ActionsPanel from './ActionsPanel'
+import { useFiltersPanel } from '@/app/(client)/layout/FiltersPanelContext'
 
 
 import Enhanced3DBackground from '@/styles/enhanced3dbackground'
@@ -44,13 +45,14 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
   category: '',
   status: ''
 })
+const dynamicFilterPanel = useFiltersPanel()
 
 
   const panels: Record<PanelKey, React.ReactNode> = {
   chat: <ChatPanel />,
   settings: <SettingsPanel />,
   help: <HelpPanel />,
-  filters: <FiltersPanel current={filters} onChange={setFilters} />,
+  filters: dynamicFilterPanel || <FiltersPanel current={filters} onChange={setFilters} />,
   actions: <ActionsPanel /> 
 }
 

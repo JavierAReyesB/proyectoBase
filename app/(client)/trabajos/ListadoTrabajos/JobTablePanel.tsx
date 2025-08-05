@@ -2,51 +2,47 @@
 
 import React, { useEffect, useState } from 'react'
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
-import { fetchTrabajos, fetchSedes, fetchTiposServicio, Trabajo } from './services/api'
+import { fetchTrabajos, Trabajo } from './services/api'
 import { jobTableColumns } from './columns'
-import JobTableFilters from './JobTableFilters'
 import { useDrawerContext } from '@/components/drawer/DrawerProvider'
-import { TrabajoDrawer } from './drawer/TrabajosDrawer' // Asegúrate de tener este archivo creado
-
-interface TipoServicio {
-  nombre: string
-  activo: boolean
-}
+import { TrabajoDrawer } from './drawer/TrabajosDrawer'
+import { useFiltroTabla } from './hooks/useFiltroTabla'
+import { useFiltrosJobs } from './FiltrosJobsContext'
 
 export const JobTablePanel: React.FC = () => {
   const [rowData, setRowData] = useState<Trabajo[]>([])
-  const [sedes, setSedes] = useState<string[]>([])
-  const [tiposServicio, setTiposServicio] = useState<TipoServicio[]>([])
-  const [selectedSede, setSelectedSede] = useState<string>('')
-  const [selectedTipo, setSelectedTipo] = useState<string>('todos')
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [showRecords, setShowRecords] = useState<string>('10')
 
+  const { selectedSede, selectedTipo, searchTerm, showRecords } = useFiltrosJobs()
   const { openDrawer } = useDrawerContext()
 
   useEffect(() => {
     fetchTrabajos().then(setRowData)
   }, [])
 
-  useEffect(() => {
-    fetchSedes().then(setSedes)
-  }, [])
+  const tipoKey = 'tipoServicio' as keyof Trabajo   
+  const searchKeys = ['cliente', 'descripcion'] as unknown as (keyof Trabajo)[]
 
-  useEffect(() => {
-    fetchTiposServicio().then(setTiposServicio)
-  }, [])
+  const filteredData = useFiltroTabla<Trabajo>({
+    data: rowData,
+    selectedSede,
+    selectedTipo,
+    searchTerm,
+    sedeKey: 'sede',
+    tipoKey: 'servicio',         
+    searchKeys,
+  })
 
   const handleRowClick = (trabajo: Trabajo) => {
     openDrawer({
       id: `trabajo-${trabajo.id}`,
-      instanceId: `trabajo-${trabajo.id}`,
-      title: `Detalle del Trabajo`,
+      instanceId: `Trabajo-${trabajo.id}`,
+      title: 'Detalle del Trabajo',
       width: 'half',
-      isPinned: false, // ✅ NECESARIO para evitar error de tipo
+      isPinned: false,
       icon: null,
       contentKey: 'trabajo',
       contentData: { trabajo },
-      content: <TrabajoDrawer data={trabajo} />
+      content: <TrabajoDrawer data={trabajo} />,
     })
   }
 
@@ -62,25 +58,11 @@ export const JobTablePanel: React.FC = () => {
         </p>
       </div>
 
-
-      {/* Panel principal */}
+      {/* Tabla */}
       <div className="bg-white rounded-md shadow-md p-4 space-y-6">
-        <JobTableFilters
-          sedes={sedes}
-          selectedSede={selectedSede}
-          setSelectedSede={setSelectedSede}
-          tiposServicio={tiposServicio}
-          selectedTipo={selectedTipo}
-          setSelectedTipo={setSelectedTipo}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          showRecords={showRecords}
-          setShowRecords={setShowRecords}
-        />
-
         <ResponsiveTable
           columnDefs={jobTableColumns}
-          rowData={rowData}
+          rowData={filteredData}
           pagination
           paginationPageSize={parseInt(showRecords)}
           breakpoint={1024}
@@ -88,7 +70,7 @@ export const JobTablePanel: React.FC = () => {
         />
 
         <div className="text-sm text-gray-600 mt-4">
-          Mostrando registros del 1 al {rowData.length} de un total de {rowData.length} registros
+          Mostrando {filteredData.length} de {rowData.length} registros
         </div>
       </div>
     </div>

@@ -2,30 +2,17 @@
 
 import React, { useEffect, useState } from 'react'
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
-import {
-  fetchPuntos,
-  fetchSedesPunto,
-  fetchTiposPunto,
-  Punto
-} from './services/api'
+import { fetchPuntos, Punto } from './services/api'
 import { puntosTableColumns } from './columns'
-import PuntosTableFilters from './tableFilters'
 import { useDrawerContext } from '@/components/drawer/DrawerProvider'
 import { PuntosDrawer } from './drawer/PuntosDrawer'
-
-interface TipoPunto {
-  nombre: string
-  activo: boolean
-}
+import { useFilters } from '../../layout/FiltersContext'  
+import { useFiltroTabla } from './hooks/useFiltroTabla'      
 
 export const TablePanel: React.FC = () => {
   const [rowData, setRowData] = useState<Punto[]>([])
-  const [sedes, setSedes] = useState<string[]>([])
-  const [tiposPunto, setTiposPunto] = useState<TipoPunto[]>([])
-  const [selectedSede, setSelectedSede] = useState<string>('')
-  const [selectedTipo, setSelectedTipo] = useState<string>('todos')
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [showRecords, setShowRecords] = useState<string>('10')
+
+  const { selectedSede, selectedTipo, searchTerm, showRecords } = useFilters()
 
   const { openDrawer } = useDrawerContext()
 
@@ -33,13 +20,12 @@ export const TablePanel: React.FC = () => {
     fetchPuntos().then(setRowData)
   }, [])
 
-  useEffect(() => {
-    fetchSedesPunto().then(setSedes)
-  }, [])
-
-  useEffect(() => {
-    fetchTiposPunto().then(setTiposPunto)
-  }, [])
+  const filteredData = useFiltroTabla({
+    data: rowData,
+    selectedSede,
+    selectedTipo,
+    searchTerm,
+  })
 
   const handleRowClick = (punto: Punto) => {
     openDrawer({
@@ -51,7 +37,7 @@ export const TablePanel: React.FC = () => {
       icon: null,
       contentKey: 'punto',
       contentData: { punto },
-      content: <PuntosDrawer data={punto} />
+      content: <PuntosDrawer data={punto} />,
     })
   }
 
@@ -67,32 +53,19 @@ export const TablePanel: React.FC = () => {
         </p>
       </div>
 
-      {/* Panel principal */}
+      {/* Tabla */}
       <div className="bg-white rounded-md shadow-md p-4 space-y-6">
-        <PuntosTableFilters
-          sedes={sedes}
-          selectedSede={selectedSede}
-          setSelectedSede={setSelectedSede}
-          tiposPunto={tiposPunto}
-          selectedTipo={selectedTipo}
-          setSelectedTipo={setSelectedTipo}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          showRecords={showRecords}
-          setShowRecords={setShowRecords}
-        />
-
         <ResponsiveTable
           columnDefs={puntosTableColumns}
-          rowData={rowData}
+          rowData={filteredData}                      
           pagination
-          paginationPageSize={parseInt(showRecords)}
+          paginationPageSize={parseInt(showRecords)}   
           breakpoint={1024}
           onRowClick={handleRowClick}
         />
 
         <div className="text-sm text-gray-600 mt-4">
-          Mostrando registros del 1 al {rowData.length} de un total de {rowData.length} registros
+          Mostrando {filteredData.length} de {rowData.length} registros
         </div>
       </div>
     </div>

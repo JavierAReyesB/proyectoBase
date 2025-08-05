@@ -32,7 +32,6 @@ const SidebarPanel: React.FC<SidebarPanelProps> = ({
   const CurrentPanel = active ? panels[active] : null
   const currentTitle = active ? titles[active] || active : ''
 
-  // 📱 Móvil → Modal de pantalla completa
   if (isMobile) {
     return (
       <Modal
@@ -56,11 +55,10 @@ const SidebarPanel: React.FC<SidebarPanelProps> = ({
     )
   }
 
-  // 🖥️ Escritorio → Sidebar deslizante
   return (
     <aside
       className={`z-30 transition-all duration-300 bg-white border-l shadow-lg
-                 h-full overflow-x-hidden ${active ? 'w-96' : 'w-0'}`}
+                 h-full overflow-x-hidden ${active ? 'w-[420px]' : 'w-0'}`}
     >
       {active && (
         <div className="flex flex-col h-full relative">

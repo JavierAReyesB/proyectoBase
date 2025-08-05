@@ -35,7 +35,7 @@ export default function PremiumLogin () {
   /* Cuando llegamos a la fase “figure” → ir al dashboard */
   useEffect(() => {
     if (phase !== 'figure') return
-    const id = setTimeout(() => router.push('/dashboard'), 2500)
+    const id = setTimeout(() => router.push('/inicio'), 2500)
     return () => clearTimeout(id)
   }, [phase, router])
 

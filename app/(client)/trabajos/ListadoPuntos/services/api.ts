@@ -13,7 +13,7 @@ export interface Punto {
   operario: string
   recomendaciones: string
   resultado: 'Riesgo Nulo' | 'Riesgo Medio' | 'Riesgo Grave'
-  prioridad: string // ✅ mantiene la línea de prioridad
+  prioridad: string 
 }
 
 export interface TipoPunto {
@@ -34,16 +34,16 @@ export async function fetchPuntos(): Promise<Punto[]> {
 }
 
 // 🔄 Simula una llamada a una API real para obtener sedes
-export async function fetchSedesPunto(): Promise<string[]> {
-  try {
-    const res = await fetch('/mock/mockSedes.json')
-    if (!res.ok) throw new Error('Error al cargar las sedes')
-    return res.json()
-  } catch (error) {
-    console.error('❌ Error en fetchSedesPunto:', error)
-    return []
-  }
-}
+// export async function fetchSedesPunto(): Promise<string[]> {
+//   try {
+//     const res = await fetch('/mock/mockSedes.json')
+//     if (!res.ok) throw new Error('Error al cargar las sedes')
+//     return res.json()
+//   } catch (error) {
+//     console.error('❌ Error en fetchSedesPunto:', error)
+//     return []
+//   }
+// }
 
 // 🔄 Simula una llamada a una API real para obtener tipos de punto
 export async function fetchTiposPunto(): Promise<TipoPunto[]> {
