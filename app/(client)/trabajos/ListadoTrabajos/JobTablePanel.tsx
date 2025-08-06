@@ -1,48 +1,69 @@
+// JobTablePanel.tsx
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
-import { fetchTrabajos, Trabajo } from './services/api'
+import { fetchTrabajos, type Trabajo } from './services/api'
 import { jobTableColumns } from './columns'
 import { useDrawerContext } from '@/components/drawer/DrawerProvider'
 import { TrabajoDrawer } from './drawer/TrabajosDrawer'
 import { useFiltroTabla } from './hooks/useFiltroTabla'
 import { useFiltrosJobs } from './FiltrosJobsContext'
+import { TableContext } from '@/components/TableContext'       // ref global
 
 export const JobTablePanel: React.FC = () => {
   const [rowData, setRowData] = useState<Trabajo[]>([])
 
+  // filtros externos
   const { selectedSede, selectedTipo, searchTerm, showRecords } = useFiltrosJobs()
-  const { openDrawer } = useDrawerContext()
 
+  // drawer context
+  const { openDrawers, openDrawer, updateDrawer } = useDrawerContext()
+
+  // ref global a la tabla (compartida con DrawerOverlay)
+  const tableRef = useContext(TableContext)!                   // <- MISMA ref
+
+  // cargar data
   useEffect(() => {
     fetchTrabajos().then(setRowData)
   }, [])
 
-  const tipoKey = 'tipoServicio' as keyof Trabajo   
-  const searchKeys = ['cliente', 'descripcion'] as unknown as (keyof Trabajo)[]
-
+  // aplicar filtros
   const filteredData = useFiltroTabla<Trabajo>({
     data: rowData,
     selectedSede,
     selectedTipo,
     searchTerm,
     sedeKey: 'sede',
-    tipoKey: 'servicio',         
-    searchKeys,
+    tipoKey: 'servicio',
+    searchKeys: ['id'] as (keyof Trabajo)[]
   })
 
+  /** Maneja el clic en una fila */
   const handleRowClick = (trabajo: Trabajo) => {
-    openDrawer({
-      id: `trabajo-${trabajo.id}`,
-      instanceId: `Trabajo-${trabajo.id}`,
-      title: 'Detalle del Trabajo',
-      width: 'half',
-      isPinned: false,
-      icon: null,
-      contentKey: 'trabajo',
+    const mainId = 'drawer-trabajo'
+    const main   = openDrawers.find(d => d.id === mainId)
+
+    const drawerData = {
+      instanceId:  `Trabajo-${trabajo.id}`,
+      contentKey:  'trabajo',
       contentData: { trabajo },
-      content: <TrabajoDrawer data={trabajo} />,
+      content:     <TrabajoDrawer data={trabajo} />,
+      hideBackdrop: true
+    }
+
+    if (main && main.width !== 'full' && !main.isPinned) {
+      updateDrawer(mainId, drawerData)          // refresca
+      return
+    }
+
+    openDrawer({
+      id:       main ? `trabajo-${trabajo.id}` : mainId,
+      title:    'Detalle del Trabajo',
+      width:    'half',
+      isPinned: false,
+      icon:     null,
+      ...drawerData
     })
   }
 
@@ -59,7 +80,10 @@ export const JobTablePanel: React.FC = () => {
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-md shadow-md p-4 space-y-6">
+      <div
+  ref={tableRef}
+  className="relative z-[7000] mix-blend-lighten bg-white rounded-md shadow-md p-4 space-y-6"
+>
         <ResponsiveTable
           columnDefs={jobTableColumns}
           rowData={filteredData}

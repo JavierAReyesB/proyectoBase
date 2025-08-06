@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { Trabajo } from '../services/api'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -12,6 +12,7 @@ interface Props {
 }
 
 export function TrabajosFormulario({ data }: Props) {
+  /* ---------- Estado interno del formulario ---------- */
   const [form, setForm] = useState({
     fecha: data.fecha,
     sede: data.sede,
@@ -22,6 +23,20 @@ export function TrabajosFormulario({ data }: Props) {
     resultado: data.resultado
   })
 
+  /* 🔄 Sincroniza el estado cada vez que cambie “data” */
+  useEffect(() => {
+    setForm({
+      fecha: data.fecha,
+      sede: data.sede,
+      tipoTrabajo: data.tipoTrabajo,
+      servicio: data.servicio,
+      operario: data.operario,
+      recomendaciones: data.recomendaciones,
+      resultado: data.resultado
+    })
+  }, [data])
+
+  /* ---------- Manejadores ---------- */
   const handle =
     (field: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,9 +46,10 @@ export function TrabajosFormulario({ data }: Props) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('Guardar cambios:', form)
-    // Aquí deberías hacer la llamada a la API o lógica de actualización
+    // TODO: llamada a la API o lógica de actualización
   }
 
+  /* ---------- Render ---------- */
   return (
     <form onSubmit={submit} className="w-full space-y-6">
       <h3 className="text-lg font-semibold">Editar Trabajo</h3>

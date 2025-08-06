@@ -1,25 +1,19 @@
+// useDrawerManager.ts
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import type { DrawerState, DrawerSize } from './drawerTypes'
 import type { MinimizedDrawerInfo } from './drawerTypes'
 
+// 🔄 Reconstruir contenido ReactNode a partir de contentKey + contentData
 function rebuildContentFromData(key: string, data: any): React.ReactNode {
-  switch (key) {
-    case 'contrato':
-      return <pre style={{ padding: 8 }}>{JSON.stringify(data, null, 2)}</pre>
-
-    case 'dashboard-card':
-      return (
-        <p>
-          {data.title}: {data.value} ({data.badge})
-        </p>
-      )
-
-    /* otros tipos que necesites… */
-    default:
-      return <div>Contenido no disponible</div>
+  if (key === 'project') {
+    return <pre style={{ padding: 8 }}>{JSON.stringify(data, null, 2)}</pre>
   }
+  if (key === 'trabajo') {
+    return <pre style={{ padding: 8 }}>{JSON.stringify(data?.trabajo ?? data, null, 2)}</pre>
+  }
+  return <div>Contenido no disponible</div>
 }
 
 export function useDrawerManager() {
@@ -28,17 +22,8 @@ export function useDrawerManager() {
 
   const hasRestoredOpen = useRef(false)
   const hasRestoredMin = useRef(false)
-  const isReady = hasRestoredOpen.current && hasRestoredMin.current
 
-  // ✅ Helper que solo permite actualizar si ya se restauró
-  const safeSetMinimizedDrawers = useCallback((updater: (prev: DrawerState[]) => DrawerState[]) => {
-    if (!hasRestoredMin.current) {
-      console.warn('⛔️ Evitando setMinimizedDrawers antes de restaurar')
-      return
-    }
-    setMinimizedDrawers(updater)
-  }, [])
-
+  // 1️⃣ Hidratar openDrawers
   useEffect(() => {
     try {
       const raw = localStorage.getItem('openDrawers')
@@ -48,7 +33,6 @@ export function useDrawerManager() {
           ...d,
           content: rebuildContentFromData(d.contentKey, d.contentData)
         }))
-        console.log('📥 Hidratar openDrawers:', restored)
         setOpenDrawers(restored)
       }
     } catch (err) {
@@ -58,6 +42,7 @@ export function useDrawerManager() {
     }
   }, [])
 
+  // 2️⃣ Hidratar minimizedDrawers
   useEffect(() => {
     try {
       const raw = localStorage.getItem('minimizedDrawers')
@@ -67,7 +52,6 @@ export function useDrawerManager() {
           ...d,
           content: rebuildContentFromData(d.contentKey, d.contentData)
         }))
-        console.log('📥 Hidratar minimizedDrawers:', restored)
         setMinimizedDrawers(restored)
       }
     } catch (err) {
@@ -77,70 +61,94 @@ export function useDrawerManager() {
     }
   }, [])
 
+  // 🔐 Utilidad para serializar un array de drawers
+  const serialize = (drawers: DrawerState[]) =>
+    drawers.map(
+      ({ id, title, width, isPinned, instanceId, contentKey, contentData }) => ({
+        id,
+        title: typeof title === 'string' ? title : '',
+        width,
+        isPinned,
+        icon: null,
+        instanceId,
+        contentKey,
+        contentData
+      })
+    )
+
+  // 3️⃣ Guardar openDrawers
   useEffect(() => {
     if (!hasRestoredOpen.current) return
-    const serializable = openDrawers.map(({ id, title, width, isPinned, icon, instanceId, contentKey, contentData }) => ({
-      id,
-      title: typeof title === 'string' ? title : '',
-      width,
-      isPinned,
-      icon: null,
-      instanceId,
-      contentKey,
-      contentData
-    }))
-    console.log('💾 Guardando openDrawers:', serializable)
-    localStorage.setItem('openDrawers', JSON.stringify(serializable))
+    localStorage.setItem('openDrawers', JSON.stringify(serialize(openDrawers)))
   }, [openDrawers])
 
+  // 4️⃣ Guardar minimizedDrawers
   useEffect(() => {
     if (!hasRestoredMin.current) return
-    const serializable = minimizedDrawers.map(({ id, title, width, isPinned, icon, instanceId, contentKey, contentData }) => ({
-      id,
-      title: typeof title === 'string' ? title : '',
-      width,
-      isPinned,
-      icon: null,
-      instanceId,
-      contentKey,
-      contentData
-    }))
-    console.log('💾 Guardando minimizedDrawers:', serializable)
-    localStorage.setItem('minimizedDrawers', JSON.stringify(serializable))
+    localStorage.setItem('minimizedDrawers', JSON.stringify(serialize(minimizedDrawers)))
   }, [minimizedDrawers])
 
-  // 👇 Estas funciones ahora usan el "safe setter"
+  // 🆕 updateDrawer: refresca y persiste de inmediato
+  const updateDrawer = useCallback((id: string, updates: Partial<DrawerState>) => {
+    setOpenDrawers(prev => {
+      const next = prev.map(d => (d.id === id ? { ...d, ...updates } : d))
+      // Persistir al vuelo
+      try {
+        localStorage.setItem('openDrawers', JSON.stringify(serialize(next)))
+      } catch (err) {
+        console.error('⚠️ Error al guardar updateDrawer:', err)
+      }
+      return next
+    })
+  }, [])
+
+  // ✅ openDrawer con reemplazo si ya existe
   const openDrawer = useCallback((drawer: DrawerState) => {
-    setOpenDrawers(prev => (prev.find(d => d.id === drawer.id) ? prev : [...prev, drawer]))
+    setOpenDrawers(prev => {
+      const exists = prev.find(d => d.id === drawer.id)
+      const next = exists ? prev.map(d => (d.id === drawer.id ? drawer : d)) : [...prev, drawer]
+      if (hasRestoredOpen.current) {
+        localStorage.setItem('openDrawers', JSON.stringify(serialize(next)))
+      }
+      return next
+    })
   }, [])
 
   const closeDrawer = useCallback((id: string) => {
     setOpenDrawers(prev => prev.filter(d => d.id !== id))
-    safeSetMinimizedDrawers(prev => prev.filter(d => d.id !== id))
-  }, [safeSetMinimizedDrawers])
+    setMinimizedDrawers(prev => prev.filter(d => d.id !== id))
+  }, [])
 
   const minimizeDrawer = useCallback((drawer: DrawerState) => {
     setOpenDrawers(prev => prev.filter(d => d.id !== drawer.id))
-    safeSetMinimizedDrawers(prev => [...prev, drawer])
-  }, [safeSetMinimizedDrawers])
+    setMinimizedDrawers(prev => [...prev, drawer])
+  }, [])
 
-  const restoreDrawer = useCallback((id: string) => {
-    safeSetMinimizedDrawers(prev => {
-      const target = prev.find(d => d.id === id)
-      if (!target) return prev
-      openDrawer(target)
-      return prev.filter(d => d.id !== id)
-    })
-  }, [openDrawer, safeSetMinimizedDrawers])
+  const restoreDrawer = useCallback(
+    (id: string) => {
+      setMinimizedDrawers(prev => {
+        const target = prev.find(d => d.id === id)
+        if (!target) return prev
+        openDrawer(target)
+        return prev.filter(d => d.id !== id)
+      })
+    },
+    [openDrawer]
+  )
 
   const resizeDrawer = useCallback((id: string, width: DrawerSize) => {
-    setOpenDrawers(prev => prev.map(d => (d.id === id ? { ...d, width } : d)))
+    setOpenDrawers(prev =>
+      prev.map(d => (d.id === id ? { ...d, width } : d))
+    )
   }, [])
 
   const pinDrawer = useCallback((id: string, isPinned: boolean) => {
-    setOpenDrawers(prev => prev.map(d => (d.id === id ? { ...d, isPinned } : d)))
+    setOpenDrawers(prev =>
+      prev.map(d => (d.id === id ? { ...d, isPinned } : d))
+    )
   }, [])
 
+  // 5️⃣ Agrupar minimizados para la barra
   const groupedMinimizedDrawers = new Map<string, MinimizedDrawerInfo[]>()
   for (const d of minimizedDrawers) {
     const key = typeof d.title === 'string' ? d.title : 'Otros'
@@ -161,12 +169,12 @@ export function useDrawerManager() {
   return {
     openDrawers,
     openDrawer,
+    updateDrawer,
     closeDrawer,
     minimizeDrawer,
     restoreDrawer,
     resizeDrawer,
     pinDrawer,
-    groupedMinimizedDrawers,
-    isReady,
+    groupedMinimizedDrawers
   }
 }

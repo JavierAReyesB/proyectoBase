@@ -20,6 +20,7 @@ export interface DrawerState {
   contentKey: string
   /** Datos serializables con los que se renderiza `content` */
   contentData?: any
+  hideBackdrop?: boolean
 }
 
 /**

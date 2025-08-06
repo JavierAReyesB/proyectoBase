@@ -13,6 +13,7 @@ body {
   }
 }
 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -93,3 +94,12 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+#drawer-root {
+  pointer-events: none;
+}
+/* …pero sus hijos (drawer, backdrop) sí los necesitan */
+#drawer-root > * {
+  pointer-events: auto;
+}
+

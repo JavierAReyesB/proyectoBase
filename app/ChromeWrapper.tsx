@@ -24,7 +24,7 @@ export default function ChromeWrapper({ children, defaultOpen }: ChromeWrapperPr
 
   return (
     <>
-      <Header activeSection="dashboard" />
+      <Header />
       <div className="flex min-h-screen pt-14">
         <SidebarProvider defaultOpen={defaultOpen}>
           <AppSidebar />

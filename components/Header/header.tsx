@@ -8,6 +8,10 @@ import { HeaderActions } from './HeaderActions'
 import { AppSidebarContentMobile } from '../app-sidebar'
 import { SidebarProvider } from '@/components/ui/sidebar'
 
+interface HeaderProps {
+  /** sección activa para resaltar en el menú */
+  activeSection?: string
+}
 export function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 

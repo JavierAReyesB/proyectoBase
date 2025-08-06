@@ -99,6 +99,8 @@ export default function ResponsiveTable<T extends Record<string, any>>(
 
   return (
     <div
+      /* 👇  Este data-attr nos permite identificar la tabla desde DrawerOverlay */
+      data-table-wrapper="true"
       ref={wrapperRef}
       className="ag-theme-alpine w-full"
       style={{ minHeight: 400 }}
