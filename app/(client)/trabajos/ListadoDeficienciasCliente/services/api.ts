@@ -13,6 +13,8 @@ export interface Deficiencia {
   operario: string
   recomendaciones: string
   resultado: 'Riesgo Nulo' | 'Riesgo Medio' | 'Riesgo Grave'
+  estado: string
+  criticidad: string
 }
 
 export interface TipoServicio {

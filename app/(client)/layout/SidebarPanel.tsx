@@ -8,14 +8,14 @@ interface SidebarPanelProps {
   active: string | null
   onClose: () => void
   panels: Record<string, React.ReactNode>
-  titles?: Record<string, string> 
+  titles?: Record<string, string>
 }
 
 const SidebarPanel: React.FC<SidebarPanelProps> = ({
   active,
   panels,
   onClose,
-  titles = {} 
+  titles = {}
 }) => {
   const [isMobile, setIsMobile] = useState(false)
 
@@ -58,13 +58,14 @@ const SidebarPanel: React.FC<SidebarPanelProps> = ({
   return (
     <aside
       className={`z-30 transition-all duration-300 bg-white border-l shadow-lg
-                 h-full overflow-x-hidden ${active ? 'w-[420px]' : 'w-0'}`}
+              h-screen overflow-hidden ${active ? 'w-[420px]' : 'w-0'}`}
     >
       {active && (
         <div className="flex flex-col h-full relative">
-          <div className="flex-1 min-h-0">
-            {CurrentPanel}
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none">
+            <div className="pr-4">{CurrentPanel}</div>
           </div>
+
         </div>
       )}
     </aside>

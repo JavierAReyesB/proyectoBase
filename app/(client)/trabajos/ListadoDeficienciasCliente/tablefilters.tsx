@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,7 +10,10 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select'
-import { Filter, RotateCcw, Search } from 'lucide-react'
+import { Filter, RotateCcw, Search, Calendar } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 
 interface TipoServicio {
   nombre: string
@@ -22,219 +25,240 @@ interface Props {
   selectedSede: string
   setSelectedSede: (value: string) => void
   tiposServicio: TipoServicio[]
+  selectedTipo: string
+  setSelectedTipo: (value: string) => void
   categorias: string[]
   selectedCategoria: string
   setSelectedCategoria: (value: string) => void
-  selectedTipo: string
-  setSelectedTipo: (value: string) => void
+  estados: string[]
+  selectedEstado: string
+  setSelectedEstado: (value: string) => void
+  criticidades: string[]
+  selectedCriticidad: string
+  setSelectedCriticidad: (value: string) => void
   searchTerm: string
   setSearchTerm: (value: string) => void
-  showRecords: string
-  setShowRecords: (value: string) => void
 }
 
-const estados = ['Pendiente', 'En Proceso', 'Cerrado', 'Todos'] as const
-type EstadoTipo = typeof estados[number]
-
-const criticidades = ['Muy Urgente', 'Urgente', 'Normal', 'Todos'] as const
-type CriticidadTipo = typeof criticidades[number]
-
-const estadoColor: Record<EstadoTipo, string> = {
+const estadoColor: Record<string, string> = {
   Pendiente: 'bg-red-500 text-white',
   'En Proceso': 'bg-yellow-400 text-black',
   Cerrado: 'bg-green-500 text-white',
   Todos: 'bg-gray-800 text-white',
 }
 
-const criticidadColor: Record<CriticidadTipo, string> = {
+const criticidadColor: Record<string, string> = {
   'Muy Urgente': 'bg-red-100 text-red-600 border border-red-400',
   Urgente: 'bg-yellow-100 text-yellow-700 border border-yellow-400',
   Normal: 'bg-white text-slate-700 border border-slate-300',
   Todos: 'bg-gray-800 text-white',
 }
 
-const JobTableFilters: React.FC<Props> = ({
-  sedes,
+const DeficienciasTableFilters: React.FC<Props> = ({
+  sedes = [],
   selectedSede,
   setSelectedSede,
-  tiposServicio,
+  tiposServicio = [],
   selectedTipo,
   setSelectedTipo,
-  categorias,
+  categorias = [],
   selectedCategoria,
   setSelectedCategoria,
+  estados = [],
+  selectedEstado,
+  setSelectedEstado,
+  criticidades = [],
+  selectedCriticidad,
+  setSelectedCriticidad,
   searchTerm,
   setSearchTerm,
-  showRecords,
-  setShowRecords,
 }) => {
+  const handleClearFilters = () => {
+    setSelectedSede('todas')
+    setSelectedTipo('todos')
+    setSelectedCategoria('todas')
+    setSelectedEstado('todos')
+    setSelectedCriticidad('todos')
+    setSearchTerm('')
+  }
 
-  const [estado, setEstado] = useState<EstadoTipo>('Todos')
-  const [criticidad, setCriticidad] = useState<CriticidadTipo>('Todos')
+  const handleApplyFilters = () => {
+  }
 
   return (
-    <>
-      {/* Filtros compactos */}
-      <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-3">
+    <div className="w-full max-w-sm mx-auto bg-white h-full px-4 pt-6 pb-20 space-y-6">
 
-        {/* Sede */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700 font-medium">Sede:</span>
-          <Select value={selectedSede} onValueChange={setSelectedSede}>
-            <SelectTrigger className="w-40 h-8 text-xs border-slate-200 focus:border-slate-400">
-              <SelectValue placeholder="Todas las sedes" />
-            </SelectTrigger>
-            <SelectContent>
-              {sedes.map((sede) => (
-                <SelectItem key={sede} value={sede}>
-                  {sede}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <h2 className="text-lg font-semibold text-gray-900">Filtros</h2>
 
-        {/* Categoría */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700 font-medium">Categoría:</span>
-          <Select value={selectedCategoria} onValueChange={setSelectedCategoria}>
-            <SelectTrigger className="w-56 h-8 text-xs border-slate-200 focus:border-slate-400">
-              <SelectValue placeholder="Todas las categorías" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas</SelectItem>
-              {categorias.map((categoria) => (
-                <SelectItem key={categoria} value={categoria}>
-                  {categoria.replaceAll('_', ' ')}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-
-        {/* Desde */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700 font-medium">Desde:</span>
-          <Input type="date" className="w-32 h-8 text-xs border-slate-200 focus:border-slate-400" />
-        </div>
-
-        {/* Hasta */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700 font-medium">Hasta:</span>
-          <Input type="date" className="w-32 h-8 text-xs border-slate-200 focus:border-slate-400" />
-        </div>
-
-        {/* Tipo Servicio */}
-        {/* <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700 font-medium">Tipo de Servicio:</span>
-          <Select value={selectedTipo} onValueChange={setSelectedTipo}>
-            <SelectTrigger className="w-44 h-8 text-xs border-slate-200 focus:border-slate-400">
-              <SelectValue placeholder="Todos los servicios" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              {tiposServicio.map((tipo) => (
-                <SelectItem key={tipo.nombre} value={tipo.nombre}>
-                  {tipo.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div> */}
-
-        {/* Botones */}
-        <div className="flex gap-2 ml-auto">
-          <Button size="sm" className="bg-slate-800 hover:bg-slate-700 text-white h-8 px-3 text-xs shadow-sm">
-            <Filter className="w-3 h-3 mr-1" />
-            Filtrar
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-slate-300 text-slate-700 hover:bg-slate-50 h-8 px-3 text-xs shadow-sm bg-transparent"
-          >
-            <RotateCcw className="w-3 h-3 mr-1" />
-            Limpiar Filtros
-          </Button>
-        </div>
-      </div>
-
-      {/* Estado y Criticidad */}
-      <div className="flex flex-col md:flex-row gap-4 border-y py-3 mb-3 text-sm">
-
-        {/* Estados */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="font-medium text-slate-700">Estados</span>
-          <div className="flex flex-wrap gap-2">
-            {estados.map((item) => (
-              <Button
-                key={item}
-                onClick={() => setEstado(item)}
-                size="sm"
-                className={`h-7 px-3 text-xs shadow-sm ${estado === item ? estadoColor[item] : 'bg-slate-100 text-slate-600'
-                  }`}
-              >
-                {item}
-              </Button>
+      {/* Sede */}
+      <div className="space-y-2">
+        <Label htmlFor="sede">Sede</Label>
+        <Select value={selectedSede} onValueChange={setSelectedSede}>
+          <SelectTrigger id="sede" className="w-full">
+            <SelectValue placeholder="Todas las sedes" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas las sedes</SelectItem>
+            {sedes.map((sede) => (
+              <SelectItem key={sede} value={sede}>
+                {sede}
+              </SelectItem>
             ))}
-          </div>
-        </div>
+          </SelectContent>
+        </Select>
+      </div>
 
-        {/* Criticidad */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="font-medium text-slate-700">Criticidad</span>
-          <div className="flex flex-wrap gap-2">
-            {criticidades.map((item) => (
-              <Button
-                key={item}
-                onClick={() => setCriticidad(item)}
-                size="sm"
-                className={`h-7 px-3 text-xs shadow-sm ${criticidad === item ? criticidadColor[item] : 'bg-slate-100 text-slate-600'
-                  }`}
-              >
-                {item}
-              </Button>
+      <Separator />
+
+      {/* Categoría */}
+      <div className="space-y-2">
+        <Label htmlFor="categoria">Categoría</Label>
+        <Select value={selectedCategoria} onValueChange={setSelectedCategoria}>
+          <SelectTrigger id="categoria" className="w-full">
+            <SelectValue placeholder="Todas las categorías" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas</SelectItem>
+            {categorias.map((categoria) => (
+              <SelectItem key={categoria} value={categoria}>
+                {categoria.replaceAll('_', ' ')}
+              </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Separator />
+
+      {/* Período */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-gray-500" />
+          <Label className="text-sm font-medium text-gray-700">Período</Label>
+        </div>
+        <div className="space-y-2">
+          <div>
+            <Label htmlFor="desde" className="text-xs text-gray-600">
+              Desde
+            </Label>
+            <Input id="desde" type="date" className="w-full text-sm" />
+          </div>
+          <div>
+            <Label htmlFor="hasta" className="text-xs text-gray-600">
+              Hasta
+            </Label>
+            <Input id="hasta" type="date" className="w-full text-sm" />
           </div>
         </div>
       </div>
 
-      {/* Mostrar y Buscar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-3 border-t border-slate-100">
+      <Separator />
 
-        {/* Mostrar */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700 font-medium">Mostrar</span>
-          <Select value={showRecords} onValueChange={setShowRecords}>
-            <SelectTrigger className="w-16 h-8 text-xs border-slate-200 focus:border-slate-400">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span className="text-sm text-slate-600">registros</span>
-        </div>
+      {/* Tipo de Servicio */}
+      <div className="space-y-2">
+        <Label htmlFor="servicio">Tipo de Servicio</Label>
+        <Select value={selectedTipo} onValueChange={setSelectedTipo}>
+          <SelectTrigger id="servicio" className="w-full">
+            <SelectValue placeholder="Todos los servicios" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos</SelectItem>
+            {tiposServicio.map((srv) => (
+              <SelectItem key={srv.nombre} value={srv.nombre}>
+                {srv.nombre}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-        {/* Buscar */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-700 font-medium">Buscar:</span>
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400 h-3 w-3" />
-            <Input
-              placeholder="Buscar en registros..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-7 w-64 h-8 text-xs border-slate-200 focus:border-slate-400"
-            />
-          </div>
+      <Separator />
+
+      {/* Buscar */}
+      <div className="space-y-2">
+        <Label htmlFor="buscar">Buscar</Label>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            id="buscar"
+            type="text"
+            placeholder="Buscar en registros..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 w-full text-sm"
+          />
         </div>
       </div>
-    </>
+
+      <Separator />
+
+      {/* Estados */}
+      {/* <div className="space-y-2">
+        <Label className="text-sm">Estados</Label>
+        <div className="flex flex-wrap gap-2">
+          {estados.map((estado) => (
+            <Badge
+              key={`estado-${estado}`}
+              className={`cursor-pointer ${estadoColor[estado] || 'bg-slate-100 text-slate-600'}`}
+              onClick={() => setSelectedEstado(estado)}
+            >
+              {estado}
+            </Badge>
+          ))}
+        </div>
+      </div> */}
+      <div className="space-y-2">
+        <Label className="text-sm">Estados</Label>
+        <div className="flex flex-wrap gap-2">
+          <Badge className="cursor-pointer bg-red-500 text-white">Pendiente</Badge>
+          <Badge className="cursor-pointer bg-yellow-400 text-black">En Proceso</Badge>
+          <Badge className="cursor-pointer bg-green-500 text-white">Cerrado</Badge>
+          <Badge className="cursor-pointer bg-gray-800 text-white">Todos</Badge>
+        </div>
+      </div>
+
+      {/* Criticidad */}
+      {/* <div className="space-y-2">
+        <Label className="text-sm">Criticidad</Label>
+        <div className="flex flex-wrap gap-2">
+          {criticidades.map((criticidad) => (
+            <Badge
+              key={`criticidad-${criticidad}`}
+              className={`cursor-pointer ${criticidadColor[criticidad] || 'bg-slate-100 text-slate-600'}`}
+              onClick={() => setSelectedCriticidad(criticidad)}
+            >
+              {criticidad}
+            </Badge>
+          ))}
+        </div>
+      </div> */}
+      <div className="space-y-2">
+        <Label className="text-sm">Criticidad</Label>
+        <div className="flex flex-wrap gap-2">
+          <Badge className="cursor-pointer bg-red-100 text-red-600 border border-red-400">Muy Urgente</Badge>
+          <Badge className="cursor-pointer bg-yellow-100 text-yellow-700 border border-yellow-400">Urgente</Badge>
+          <Badge className="cursor-pointer bg-white text-slate-700 border border-slate-300">Normal</Badge>
+          <Badge className="cursor-pointer bg-gray-800 text-white">Todos</Badge>
+        </div>
+      </div>
+
+      {/* Botones */}
+      <div className="pt-4 flex gap-2">
+        <Button className="w-full" onClick={handleApplyFilters}>
+          <Filter className="w-4 h-4 mr-2" />
+          Filtrar
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full bg-transparent"
+          onClick={handleClearFilters}
+        >
+          <RotateCcw className="w-4 h-4 mr-2" />
+          Limpiar Filtros
+        </Button>
+      </div>
+    </div>
   )
 }
 
-export default JobTableFilters
+export default DeficienciasTableFilters

@@ -1,4 +1,3 @@
-// ListadoTrabajos/columns.ts
 import clsx from 'clsx'
 import { Download, Eye, AlertTriangle } from 'lucide-react'
 import { ColDef } from 'ag-grid-community'

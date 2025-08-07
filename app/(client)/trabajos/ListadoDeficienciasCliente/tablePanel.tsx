@@ -1,70 +1,74 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ResponsiveTable from '@/components/tableAGgrid/ResponsiveTable'
 import {
   fetchDeficiencias,
-  fetchSedesDef,
-  fetchTiposServicioDef,
-  fetchCategoriasDef,
   Deficiencia
 } from './services/api'
 import { jobTableColumns } from './columns'
-import JobTableFilters from './tablefilters'
 import { useDrawerContext } from '@/components/drawer/DrawerProvider'
 import { DeficienciaDrawer } from './drawer/DeficienciaDrawer'
-
-
-interface TipoServicio {
-  nombre: string
-  activo: boolean
-}
+import { useFiltroTabla } from './hooks/useFiltroTabla'
+import { useFiltrosDeficiencias } from './FiltrosDeficienciasContext'
+import { TableContext } from '@/components/TableContext'
 
 export const DeficienciaTablePanel: React.FC = () => {
   const [rowData, setRowData] = useState<Deficiencia[]>([])
-  const [sedes, setSedes] = useState<string[]>([])
-  const [tiposServicio, setTiposServicio] = useState<TipoServicio[]>([])
-  const [selectedSede, setSelectedSede] = useState<string>('')
-  const [selectedTipo, setSelectedTipo] = useState<string>('todos')
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [showRecords, setShowRecords] = useState<string>('10')
-  const [categorias, setCategorias] = useState<string[]>([])
-  const [selectedCategoria, setSelectedCategoria] = useState<string>('todas')
 
+  const {
+    selectedSede,
+    selectedTipo,
+    selectedCategoria,
+    searchTerm,
+    showRecords
+  } = useFiltrosDeficiencias()
 
-  const { openDrawer } = useDrawerContext()
+  const { openDrawers, openDrawer, updateDrawer } = useDrawerContext()
+  const tableRef = useContext(TableContext)!
 
   useEffect(() => {
     fetchDeficiencias().then(setRowData)
   }, [])
 
-  useEffect(() => {
-    fetchSedesDef().then(setSedes)
-  }, [])
-
-  useEffect(() => {
-    fetchTiposServicioDef().then(setTiposServicio)
-  }, [])
-
-  useEffect(() => {
-    fetchCategoriasDef().then(setCategorias)
-  }, [])
-
-
-  const handleRowClick = (row: Deficiencia) => {
-  openDrawer({
-    id: `deficiencia-${row.id}`,
-    instanceId: `deficiencia-${row.id}`,
-    title: `Deficiencia`, // ✅ igual para todos
-    width: 'half',
-    isPinned: false,
-    icon: null,
-    contentKey: 'deficiencia',
-    contentData: row,
-    content: <DeficienciaDrawer data={row} />
+  const filteredData = useFiltroTabla<Deficiencia>({
+    data: rowData,
+    selectedSede,
+    selectedTipo,
+    selectedCategoria,
+    searchTerm,
+    sedeKey: 'sede',
+    tipoKey: 'servicio',
+    categoriaKey: 'tipoTrabajo',
+    searchKeys: ['id'] as (keyof Deficiencia)[]
   })
-}
 
+  const handleRowClick = (def: Deficiencia) => {
+    const mainId = 'drawer-deficiencia'
+    const main = openDrawers.find(d => d.id === mainId)
+
+    const drawerData = {
+      instanceId: `Deficiencia-${def.id}`,
+      contentKey: 'deficiencia',
+      contentData: { def },
+      content: <DeficienciaDrawer data={def} />,
+      hideBackdrop: true
+    }
+
+    if (main && main.width !== 'full' && !main.isPinned) {
+      updateDrawer(mainId, drawerData)
+      return
+    }
+
+    openDrawer({
+      id: main ? `deficiencia-${def.id}` : mainId,
+      title: 'Detalle de Deficiencia',
+      width: 'half',
+      isPinned: false,
+      icon: null,
+      ...drawerData
+    })
+  }
 
   return (
     <div className="space-y-6 px-2 sm:px-4 md:px-6 py-6">
@@ -74,56 +78,42 @@ export const DeficienciaTablePanel: React.FC = () => {
           Panel de Deficiencias
         </h1>
         <p className="text-slate-600 font-light text-sm sm:text-base">
-          Listado y seguimiento de riesgos detectados
+          Listado y control de deficiencias detectadas
         </p>
       </div>
 
-
-      {/* Panel principal */}
-      <div className="bg-white rounded-md shadow-md p-4 space-y-6">
-        <JobTableFilters
-          sedes={sedes}
-          selectedSede={selectedSede}
-          setSelectedSede={setSelectedSede}
-          tiposServicio={tiposServicio}
-          selectedTipo={selectedTipo}
-          setSelectedTipo={setSelectedTipo}
-          categorias={categorias}
-          selectedCategoria={selectedCategoria}
-          setSelectedCategoria={setSelectedCategoria}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          showRecords={showRecords}
-          setShowRecords={setShowRecords}
-        />
-
-
+      {/* Tabla */}
+      <div
+        ref={tableRef}
+        className="relative z-[7000] mix-blend-lighten bg-white rounded-md shadow-md p-4 space-y-6"
+      >
         <ResponsiveTable
           columnDefs={jobTableColumns}
-          rowData={rowData}
+          rowData={filteredData}
           pagination
           paginationPageSize={parseInt(showRecords)}
           breakpoint={1024}
           onRowClick={handleRowClick}
           mobileCardProps={{
-            titleField: 'tipoTrabajo',
-            hiddenFields: ['id'],
-            collapsedFields: ['fecha', 'sede'],
+            titleField: 'sede',
+            collapsedFields: ['estado', 'tipoTrabajo'],
+            hiddenFields: [],
             expandedFieldOrder: [
               'fecha',
               'sede',
               'tipoTrabajo',
               'servicio',
               'operario',
+              'recomendaciones',
+              'criticidad',
               'resultado',
-              'recomendaciones'
+              'estado'
             ]
           }}
-
         />
 
         <div className="text-sm text-gray-600 mt-4">
-          Mostrando registros del 1 al {rowData.length} de un total de {rowData.length} registros
+          Mostrando {filteredData.length} de {rowData.length} registros
         </div>
       </div>
     </div>

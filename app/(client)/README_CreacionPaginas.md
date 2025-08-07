@@ -1,96 +1,121 @@
-# Guía para la Creación de una Nueva Página en el Proyecto
+# 🧩 Guía para la Creación de una Nueva Página en el Proyecto
 
-Esta guía describe el **proceso genérico y paso a paso** para crear una nueva página siguiendo la misma estructura utilizada en `ListadoDeficiencias`.
+Esta guía describe el proceso paso a paso para crear una nueva página **modular, responsive y reutilizable**, siguiendo el patrón de `ListadoDeficienciasCliente`.
 
-## 1. Estructura de Archivos
-
-
-Cada página debe contener **mínimo** estos elementos:
-
-/<NombrePagina>/
-├── page.tsx # Página principal que usa el layout
-├── tablePanel.tsx # Panel principal con filtros y tabla
-├── tablefilters.tsx # Componente de filtros personalizados
-├── columns.ts # Definición de columnas de la tabla
-├── drawer/
-│ ├── <Nombre>Drawer.tsx # Drawer que contiene detalle y formulario
-│ ├── <Nombre>DetalleTabla.tsx # Tabla detalle de un elemento
-│ ├── <Nombre>Formulario.tsx # Formulario para editar elemento
-├── services/
-│ ├── api.ts # Todas las llamadas API relacionadas
-
-
-> 📌 Los nombres deben adaptarse a la entidad. Ejemplo: `Deficiencia` → `DeficienciaDrawer`, `DeficienciaFormulario`, etc.
+Está pensada para cualquier programador que se incorpore al equipo y necesite crear rápidamente una nueva sección sin romper consistencia ni romper la arquitectura base.
 
 ---
 
+## 📁 Estructura General
 
-## 2. Página Principal (`page.tsx`)
+Cada nueva página debe contener al menos los siguientes archivos:
+
+/<NuevaEntidad>/
+├── page.tsx # Entrada principal
+├── tablePanel.tsx # Lógica principal de la tabla + filtros + drawer
+├── tablefilters.tsx # Vista lateral con filtros visuales
+├── columns.ts # Definición de columnas AG Grid
+├── drawer/
+│ ├── <Entidad>Drawer.tsx # Agrupa el detalle + formulario
+│ ├── <Entidad>DetalleTabla.tsx # Tabla de 1 fila con datos del drawer
+│ └── <Entidad>Formulario.tsx # Formulario editable
+├── hooks/
+│ └── useFiltroTabla.ts # Hook para aplicar filtros a los datos
+├── services/
+│ └── api.ts # Simulación o llamadas API reales
+├── Filtros<Entidad>Context.tsx # Contexto global de filtros
+├── <Entidad>TableFiltersWrapper.tsx # Inyección lógica de filtros
 
 
-Encapsula el contenido en el `PageWrapper` y carga el `TablePanel` principal.
+> 📌 Los nombres de archivo deben adaptarse a la entidad: `Deficiencia`, `Aviso`, `Contrato`, etc.
+
+---
+
+## 1. `page.tsx` – Página principal
 
 ```tsx
 'use client'
 
 import { PageWrapper } from '@/app/(client)/layout/PageWrapper'
+import { FiltrosMiEntidadProvider } from './FiltrosMiEntidadContext'
+import { FiltersPanelProvider } from '@/app/(client)/layout/FiltersPanelContext'
+import { MiEntidadTableFiltersWrapper } from './MiEntidadTableFiltersWrapper'
 import { MiEntidadTablePanel } from './tablePanel'
 
 export default function MiEntidadPage() {
   return (
-    <PageWrapper>
-      <MiEntidadTablePanel />
-    </PageWrapper>
+    <FiltrosMiEntidadProvider>
+      <FiltersPanelProvider filtersComponent={<MiEntidadTableFiltersWrapper />}>
+        <PageWrapper>
+          <MiEntidadTablePanel />
+        </PageWrapper>
+      </FiltersPanelProvider>
+    </FiltrosMiEntidadProvider>
   )
 }
+✔️ Por qué:
+FiltrosProvider: encapsula los filtros en contexto global.
 
+FiltersPanelProvider: permite inyectar el sidebar de filtros reutilizable.
 
-3. Panel Principal (tablePanel.tsx)
+PageWrapper: asegura consistencia visual y layout común.
 
+2. tablePanel.tsx – Lógica de la tabla
+Contiene:
 
-Obtiene datos desde services/api.ts.
+Carga de datos con useEffect.
 
-Renderiza los filtros (tablefilters.tsx).
+Aplicación de filtros con useFiltroTabla.
 
-Renderiza la tabla (ResponsiveTable).
+Render de ResponsiveTable.
 
-Maneja la apertura del Drawer al hacer clic en una fila.
+Lógica para abrir Drawer al hacer click en una fila.
 
-Puntos clave:
+✔️ Claves importantes:
+mobileCardProps define orden y visibilidad de campos en móvil.
 
-useEffect para cargar datos al montar el componente.
+Usa TableContext para referencias de tamaño.
 
-handleRowClick para abrir el drawer.
+paginationPageSize y breakpoint aseguran experiencia responsive.
 
-Uso de paginationPageSize y breakpoint para responsive.
+3. tablefilters.tsx – Componente de filtros visuales
+Contiene:
 
+Selects (sede, tipo, categoría)
 
-4. Filtros (tablefilters.tsx)
+Input de búsqueda
 
+Pickers de fecha
 
-Define campos para filtrar datos (selects, inputs, date pickers).
+Badges de estado y criticidad
 
-Utiliza componentes de UI reutilizables (Select, Input, Button).
+Botones para aplicar y limpiar filtros
 
-Gestiona estados con useState y setXXX recibidos por props.
+Este componente no maneja lógica de datos, solo presentación y eventos.
 
-Incluye acciones Filtrar y Limpiar filtros.
+4. Filtros<Entidad>Context.tsx – Contexto de filtros
 
+Centraliza los filtros aplicados para que puedan ser utilizados por:
 
-5. Columnas (columns.ts)
+La tabla
 
+El drawer
 
-Se definen como un array de objetos ColDef[].
+Widgets futuros (Dashboard)
 
-Cada columna debe tener:
+También puedes agregar aquí showRecords o paginación global si lo deseas.
 
-headerName: Nombre visible en tabla.
+5. useFiltroTabla.ts – Hook para aplicar filtros
 
-field: Propiedad del dato.
+Este hook permite reutilizar lógica con claves configurables como:
 
-cellRenderer opcional para renderizado personalizado.
+sedeKey, tipoKey, categoriaKey
 
-Ejemplo:
+searchKeys para filtrar por múltiples campos
+
+Ventaja: se desacopla la lógica de filtrado del componente de tabla.
+
+6. columns.ts – Definición de columnas AG Grid
 
 export const jobTableColumns: ColDef[] = [
   { headerName: 'Fecha', field: 'fecha' },
@@ -102,61 +127,45 @@ export const jobTableColumns: ColDef[] = [
     ),
   },
 ]
+Recomendaciones:
 
+Siempre usar cellRenderer para estilos o íconos.
 
-6. Drawer (drawer/<Nombre>Drawer.tsx)
+Usar truncado (max-w) en campos largos como observaciones.
 
+7. drawer/<Entidad>Drawer.tsx – Componente principal del Drawer
+Agrupa los subcomponentes del drawer:
 
-Contiene dos partes principales:
+Detalle en formato tabla (<Entidad>DetalleTabla)
 
-Detalle: Muestra datos en formato tabla (<Nombre>DetalleTabla).
+Formulario editable (<Entidad>Formulario)
 
-Formulario: Permite editar datos (<Nombre>Formulario).
+Permite mantener independencia visual y lógica.
 
-Ejemplo:
+8. drawer/<Entidad>DetalleTabla.tsx
+Renderiza los detalles del registro como una fila de tabla usando ResponsiveTable.
 
-export function MiEntidadDrawer({ data }: { data: MiEntidad }) {
-  return (
-    <div className="w-full flex flex-col gap-6">
-      <MiEntidadDetalleTabla data={data} />
-      <MiEntidadFormulario data={data} />
-    </div>
-  )
-}
+<ResponsiveTable
+  columnDefs={columnDefs}
+  rowData={[data]}
+  pagination={false}
+/>
 
+9. drawer/<Entidad>Formulario.tsx
 
-7. Detalle (<Nombre>DetalleTabla.tsx)
+Formulario editable con campos controlados por useState.
 
+const [form, setForm] = useState({ campo1: data.campo1, ... })
 
-Tabla con una sola fila (rowData={[data]}).
+const handle = (campo: keyof Form) => (e) =>
+  setForm({ ...form, [campo]: e.target.value })
 
-Columnas adaptadas al detalle del elemento.
+10. services/api.ts – API y mocks
+Debe contener:
 
-Uso de ResponsiveTable para mantener consistencia.
+Interfaces (Entidad, TipoServicio, etc.)
 
-
-8. Formulario (<Nombre>Formulario.tsx)
-
-
-Usa estados locales para editar campos.
-
-Maneja cambios con un handle genérico.
-
-onSubmit para enviar datos a la API.
-
-
-9. Servicios (services/api.ts)
-
-
-Centraliza todas las llamadas API relacionadas con la página:
-
-Fetch principal (fetchMiEntidad).
-
-Otros fetch para listas (sedes, categorías, tipos…).
-
-Simular datos con /mock/ en desarrollo si no hay backend.
-
-Ejemplo:
+Funciones para simular o hacer fetch real
 
 export async function fetchMiEntidad(): Promise<MiEntidad[]> {
   const res = await fetch('/mock/data.json')
@@ -164,61 +173,93 @@ export async function fetchMiEntidad(): Promise<MiEntidad[]> {
   return res.json()
 }
 
+11. <Entidad>TableFiltersWrapper.tsx
+Este archivo:
 
-10. Flujo para Crear una Nueva Página
+Llama a fetchMiEntidad para obtener sedes, tipos, categorías, etc.
 
+Convierte esos datos en props para tablefilters.tsx.
 
-Crear carpeta /app/(client)/<NuevaPagina>/
+✔️ Por qué:
+Permite separar la lógica de datos de la vista.
 
-Copiar la estructura de ListadoDeficiencias y renombrar archivos.
+12. Drawers: integración
 
-Actualizar nombres de componentes, tipos y rutas.
+Usamos DrawerProvider y useDrawerContext:
 
-Definir columnas en columns.ts.
+openDrawer({
+  id: 'drawer-id',
+  title: 'Título',
+  width: 'half',
+  isPinned: false,
+  content: <MiEntidadDrawer data={data} />
+})
+Los drawers pueden:
 
-Actualizar API en services/api.ts.
+Abrirse desde cualquier componente
 
-Configurar filtros en tablefilters.tsx.
+Mantener múltiples instancias
 
-Probar funcionalidad de tabla y drawer.
+Actualizarse dinámicamente si ya están abiertos
 
-Conectar con API real (opcional en primera fase).
+13. ResponsiveTable: claves para vista móvil
 
+mobileCardProps={{
+  titleField: 'sede',
+  collapsedFields: ['estado'],
+  expandedFieldOrder: ['fecha', 'resultado', 'operario']
+}}
+Estas props son necesarias para que el diseño en móvil sea legible y personalizado.
 
+14. Flujo resumido para crear nueva página
 
-11. Buenas Prácticas
+Crear carpeta: /app/(client)/MiEntidad/
 
+Copiar archivos desde ListadoDeficienciasCliente
 
-Mantener consistencia en nombres.
+Renombrar archivos y tipos (Deficiencia → MiEntidad)
 
-No mezclar lógica de API en componentes.
+Definir columnas en columns.ts
 
-Usar ResponsiveTable para asegurar soporte móvil.
+Crear lógica en api.ts
 
-No duplicar código: reutilizar componentes de UI.
+Configurar filtros en tablefilters.tsx
 
+Testear tabla y drawer (desktop y móvil)
 
-12. Ejemplo de Nombres
+Conectar con API real si es necesario
 
+15. Buenas prácticas
 
-Para la entidad Incidencia:
+✅ Nombres consistentes
+✅ No mezclar lógica en componentes visuales
+✅ Separar lógica de filtros del componente visual
+✅ Reutilizar UI estándar (botones, selects, inputs)
+✅ Reutilizar ResponsiveTable para mantener consistencia
+✅ Encapsular filtros en contextos propios por entidad
+✅ Simular datos usando /mock/ si no hay backend
+
+16. Ejemplo de nombres por entidad Incidencia
 
 IncidenciaPage.tsx
 IncidenciaTablePanel.tsx
-IncidenciaTableFilters.tsx
 IncidenciaDrawer.tsx
 IncidenciaDetalleTabla.tsx
 IncidenciaFormulario.tsx
+FiltrosIncidenciaContext.tsx
+IncidenciaTableFiltersWrapper.tsx
 services/api.ts
 columns.ts
 
+17. Recursos útiles
 
-13. Recursos
+ResponsiveTable → Tabla AG Grid + cards móviles
 
+DrawerProvider → Control de drawers global
 
-ResponsiveTable: Componente reutilizable para tablas adaptativas.
+FiltersPanelProvider → Sidebar lateral de filtros
 
-DrawerProvider: Contexto para manejar drawers globales.
+TableContext → Referencias para ajuste dinámico
 
-UI Components: Inputs, Selects y Botones estandarizados.
+PageWrapper → Estructura común de página
 
