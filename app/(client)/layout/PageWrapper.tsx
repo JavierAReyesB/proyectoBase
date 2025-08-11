@@ -7,7 +7,8 @@ import {
   Settings,
   HelpCircle,
   Filter,
-  Zap
+  Zap,
+  LayoutGrid, 
 } from 'lucide-react'
 
 import SidebarPanel from './SidebarPanel'
@@ -19,12 +20,9 @@ import FiltersPanel from './FiltersPanel'
 import ActionsPanel from './ActionsPanel'
 import { useFiltersPanel } from '@/app/(client)/layout/FiltersPanelContext'
 
-
 import Enhanced3DBackground from '@/styles/enhanced3dbackground'
 
 type PanelKey = 'chat' | 'settings' | 'help' | 'filters' | 'actions'
-
-
 
 interface PageWrapperProps {
   className?: string
@@ -41,40 +39,35 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
 }) => {
   const [activePanel, setActivePanel] = useState<PanelKey | null>(null)
   const [filters, setFilters] = useState({
-  search: '',
-  category: '',
-  status: ''
-})
-const dynamicFilterPanel = useFiltersPanel()
-
+    search: '',
+    category: '',
+    status: ''
+  })
+  const dynamicFilterPanel = useFiltersPanel()
 
   const panels: Record<PanelKey, React.ReactNode> = {
-  chat: <ChatPanel />,
-  settings: <SettingsPanel />,
-  help: <HelpPanel />,
-  filters: dynamicFilterPanel || <FiltersPanel current={filters} onChange={setFilters} />,
-  actions: <ActionsPanel /> 
-}
+    chat: <ChatPanel />,
+    settings: <SettingsPanel />,
+    help: <HelpPanel />,
+    filters: dynamicFilterPanel || <FiltersPanel current={filters} onChange={setFilters} />,
+    actions: <ActionsPanel />
+  }
 
   const titles: Record<PanelKey, string> = {
-  chat: 'Chat',
-  settings: 'Configuración',
-  help: 'Centro de ayuda',
-  filters: 'Filtros',
-  actions: 'Acciones rápidas' 
-}
+    chat: 'Chat',
+    settings: 'Configuración',
+    help: 'Centro de ayuda',
+    filters: 'Filtros',
+    actions: 'Acciones rápidas'
+  }
 
-
-const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
-  { key: 'chat', icon: <MessageCircle className="w-5 h-5" />, label: 'Chat' },
-  { key: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Configuración' },
-  { key: 'help', icon: <HelpCircle className="w-5 h-5" />, label: 'Ayuda' },
-  { key: 'filters', icon: <Filter className="w-5 h-5" />, label: 'Filtros' },
-  { key: 'actions', icon: <Zap className="w-5 h-5" />, label: 'Acciones' }
-]
-
-
-
+  const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
+    { key: 'chat', icon: <MessageCircle className="w-5 h-5" />, label: 'Chat' },
+    { key: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Configuración' },
+    { key: 'help', icon: <HelpCircle className="w-5 h-5" />, label: 'Ayuda' },
+    { key: 'filters', icon: <Filter className="w-5 h-5" />, label: 'Filtros' },
+    { key: 'actions', icon: <Zap className="w-5 h-5" />, label: 'Acciones' }
+  ]
 
   return (
     <div className="relative flex flex-1 h-[100dvh] md:h-screen overflow-hidden">
@@ -83,10 +76,10 @@ const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
 
       {/* CONTENIDO PRINCIPAL */}
       <main
-      style={{
-    scrollbarWidth: 'none', // Firefox
-    msOverflowStyle: 'none' // IE/Edge
-  }}
+        style={{
+          scrollbarWidth: 'none', 
+          msOverflowStyle: 'none' 
+        }}
         className={cn(
           'flex-1 overflow-y-auto max-h-[90dvh] md:max-h-screen pb-32 md:pb-0 transition-all duration-300 z-10',
           className
@@ -102,7 +95,7 @@ const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
             </div>
           )}
           {children}
-           <div className="h-16" />
+          <div className="h-16" />
         </div>
       </main>
 
@@ -114,10 +107,13 @@ const buttons: { key: PanelKey; icon: React.ReactNode; label: string }[] = [
           panels={panels}
           titles={titles}
         />
+
+        {/* 👇 Aquí cambiamos el icono del FAB pasando `fabIcon` */}
         <SidebarToggleBar
           active={activePanel}
           onToggle={setActivePanel}
           buttons={buttons}
+          fabIcon={<LayoutGrid size={26} strokeWidth={2.25} />} 
         />
       </div>
     </div>
