@@ -47,7 +47,12 @@ export function MinimizedDrawersBar({
   if (groupedDrawers.size === 0) return null
 
   return (
-    <div className='fixed bottom-4 right-4 z-[5000] flex flex-row items-center gap-2 bg-background p-2 rounded-lg shadow-lg max-w-[calc(100vw-32px)] overflow-x-auto'>
+    <div
+      className='fixed bottom-4 right-4 z-[5000] flex flex-row items-center gap-2 bg-background p-2 rounded-lg shadow-lg max-w-[calc(100vw-32px)] overflow-x-auto'
+      data-drawer-ignore="true"
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
       {Array.from(groupedDrawers.entries()).map(([title, drawersList]) => {
         const firstDrawer = drawersList[0]
         const count = drawersList.length
@@ -59,7 +64,10 @@ export function MinimizedDrawersBar({
             <div key={title} className='flex items-center gap-1'>
               <Button
                 variant='ghost'
-                onClick={() => onRestoreIndividual(singleDrawer.id)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRestoreIndividual(singleDrawer.id)
+                }}
                 className='flex items-center gap-2 px-3 py-2 h-auto text-sm font-medium whitespace-nowrap'
               >
                 {singleDrawer.icon && (
@@ -72,7 +80,10 @@ export function MinimizedDrawersBar({
               <Button
                 size='sm'
                 variant='ghost'
-                onClick={() => onCloseIndividual(singleDrawer.id)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onCloseIndividual(singleDrawer.id)
+                }}
                 className='h-8 w-8 p-0'
               >
                 <X className='h-4 w-4' />
@@ -91,6 +102,7 @@ export function MinimizedDrawersBar({
                 <Button
                   variant='ghost'
                   className='flex items-center gap-2 px-3 py-2 h-auto text-sm font-medium whitespace-nowrap'
+                  onClick={(e) => e.stopPropagation()}
                 >
                   {firstDrawer.icon && (
                     <div className='flex-shrink-0'>{firstDrawer.icon}</div>
@@ -108,11 +120,16 @@ export function MinimizedDrawersBar({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className='w-64 p-2 mb-2' align='end'>
+              <PopoverContent
+                className='w-64 p-2 mb-2'
+                align='end'
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className='flex flex-col gap-1'>
-                  {drawersList.map((drawer) => (
+                  {drawersList.map((drawer, idx) => (
                     <div
-                      key={drawer.id}
+                      key={`${drawer.id}-${drawer.instanceId ?? idx}`} /* clave única */
                       className='flex items-center justify-between rounded-md bg-muted/50 p-2 text-xs'
                     >
                       <span className='truncate'>
@@ -122,7 +139,8 @@ export function MinimizedDrawersBar({
                         <Button
                           size='sm'
                           variant='ghost'
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             onRestoreIndividual(drawer.id)
                             setOpenPopoverTitle(null)
                           }}
@@ -133,7 +151,8 @@ export function MinimizedDrawersBar({
                         <Button
                           size='sm'
                           variant='ghost'
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             onCloseIndividual(drawer.id)
                             if (drawersList.length === 1) {
                               setOpenPopoverTitle(null)
@@ -154,7 +173,8 @@ export function MinimizedDrawersBar({
             <Button
               size='sm'
               variant='ghost'
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 drawersList.forEach((d) => onCloseIndividual(d.id))
                 setOpenPopoverTitle(null)
               }}

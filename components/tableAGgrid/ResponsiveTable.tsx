@@ -13,6 +13,7 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { ModuleRegistry, AllCommunityModule, GridOptions } from 'ag-grid-community'
 import MobileCard, { MobileCardProps } from '../tableAGgrid/MobileCard'
+import ScreenLoader from '../loader/ScreenLoader' 
 
 ModuleRegistry.registerModules([AllCommunityModule])
 
@@ -30,6 +31,8 @@ interface ResponsiveTableProps<T extends Record<string, any>> {
   onRowClick?: (row: T) => void
   /** GridOptions de AG Grid para extender comportamiento sin tocar el componente */
   gridOptions?: GridOptions<T>
+  /** Permite forzar el estado de carga; si no se pasa, se infiere con rowData */
+  isLoading?: boolean
 }
 
 export default function ResponsiveTable<T extends Record<string, any>>(
@@ -44,13 +47,15 @@ export default function ResponsiveTable<T extends Record<string, any>>(
     renderCard,
     mobileCardProps,
     onRowClick,
-    gridOptions = {}
+    gridOptions = {},
+    isLoading
   } = props
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<AgGridReact<T>>(null)
 
   const [isMobile, setIsMobile] = useState(false)
+  const loading = isLoading ?? rowData.length === 0
 
   useEffect(() => {
     if (!wrapperRef.current) return
@@ -62,10 +67,13 @@ export default function ResponsiveTable<T extends Record<string, any>>(
     return () => ro.disconnect()
   }, [breakpoint])
 
-  const onGridReady = useCallback((params: any) => {
-    params.api.sizeColumnsToFit()
-    gridOptions?.onGridReady?.(params)
-  }, [gridOptions])
+  const onGridReady = useCallback(
+    (params: any) => {
+      params.api.sizeColumnsToFit()
+      gridOptions?.onGridReady?.(params)
+    },
+    [gridOptions]
+  )
 
   const handleRowClicked = useCallback(
     (event: any) => {
@@ -75,12 +83,19 @@ export default function ResponsiveTable<T extends Record<string, any>>(
     [onRowClick, gridOptions]
   )
 
+  /* ---------- VISTA MÓVIL (tarjetas) ---------- */
   if (isMobile) {
     return (
       <div
+        data-table-wrapper="true"
         ref={wrapperRef}
-        className="grid grid-cols-1 gap-4 px-0 sm:px-2 md:px-4 w-full"
+        className="relative grid grid-cols-1 gap-4 px-0 sm:px-2 md:px-4 w-full"
       >
+        {loading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+            <ScreenLoader tip="Cargando..." />
+          </div>
+        )}
         {rowData.map((row, idx) => {
           const card = renderCard ? renderCard(row) : (
             <MobileCard data={row} {...mobileCardProps} />
@@ -97,14 +112,21 @@ export default function ResponsiveTable<T extends Record<string, any>>(
     )
   }
 
+  /* ---------- VISTA ESCRITORIO (AG Grid) ---------- */
   return (
     <div
       /* 👇  Este data-attr nos permite identificar la tabla desde DrawerOverlay */
       data-table-wrapper="true"
       ref={wrapperRef}
-      className="ag-theme-alpine w-full"
+      className="ag-theme-alpine w-full relative"
       style={{ minHeight: 400 }}
     >
+      {loading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <ScreenLoader tip="Cargando..." />
+        </div>
+      )}
+
       <AgGridReact<T>
         ref={gridRef}
         columnDefs={columnDefs}
@@ -122,7 +144,7 @@ export default function ResponsiveTable<T extends Record<string, any>>(
           filter: true,
           minWidth: 120
         }}
-        {...gridOptions} // ⬅️ Permite extender opciones avanzadas
+        {...gridOptions} //  Permite extender opciones avanzadas
       />
     </div>
   )
