@@ -25,4 +25,12 @@ export const AVAILABLE_WIDGETS = [
     description: 'Gestión de contratos registrados',
     defaultSize: { width: 600, height: 500 }
   },
+  {
+  type: 'deficiencias',
+  title: 'Deficiencias',
+  icon: FileText,
+  description: 'Gestión de deficiencias registradas',
+  defaultSize: { width: 600, height: 500 }
+},
+
 ] as const;

@@ -10,18 +10,22 @@ export interface MobileCardProps<T extends Record<string, any>> {
   data: T
   titleField?: keyof T
   hiddenFields?: (keyof T)[]
-  collapsedFields?: (keyof T)[] // <- nuevo: qué mostrar en contraído
-  expandedFieldOrder?: (keyof T)[] // <- nuevo: orden personalizado
+  collapsedFields?: (keyof T)[]
+  expandedFieldOrder?: (keyof T)[]
   defaultCompact?: boolean
+  labels?: Partial<Record<keyof T, React.ReactNode>>
+  formatters?: Partial<Record<keyof T, (value: any, row: T) => React.ReactNode>>
 }
 
 export default function MobileCard<T extends Record<string, any>>({
   data,
   titleField,
   hiddenFields = [],
-  collapsedFields = [], // si no defines nada, no muestra extra en contraído
+  collapsedFields = [],
   expandedFieldOrder,
-  defaultCompact = true
+  defaultCompact = true,
+  labels,
+  formatters
 }: MobileCardProps<T>) {
   const [compact, setCompact] = useState(defaultCompact)
 
@@ -37,7 +41,9 @@ export default function MobileCard<T extends Record<string, any>>({
       key.toLowerCase()
     )
 
-  // Reordenar según expandedFieldOrder si está definido
+  const getLabel = (key: string) =>
+    (labels?.[key as keyof T] ?? key) as React.ReactNode
+
   const orderedEntries = expandedFieldOrder
     ? expandedFieldOrder
         .map((field) => visibleEntries.find(([k]) => k === field))
@@ -46,13 +52,11 @@ export default function MobileCard<T extends Record<string, any>>({
 
   return (
     <div className="w-full rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 shadow-sm transition-all hover:shadow-md">
-      {/* Encabezado */}
       <div className="p-4 flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          {/* Imagen pequeña */}
-          {isImage(data?.foto) && (
+          {isImage((data as any)?.foto) && (
             <Image
-              src={String(data.foto)}
+              src={String((data as any).foto)}
               alt={titleField ? String(data[titleField]) : 'Imagen'}
               width={48}
               height={48}
@@ -71,16 +75,15 @@ export default function MobileCard<T extends Record<string, any>>({
               {titleField ? String(data[titleField]) : 'Detalle'}
             </h3>
 
-            {/* Mostrar collapsedFields */}
             {collapsedFields.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 mt-1">
                 {collapsedFields.map((field) =>
-                  data[field] ? (
+                  (data as any)[field] ? (
                     <span
                       key={String(field)}
                       className="text-xs text-gray-500 flex items-center gap-1 truncate"
                     >
-                      {String(data[field])}
+                      {String((data as any)[field])}
                     </span>
                   ) : null
                 )}
@@ -89,7 +92,6 @@ export default function MobileCard<T extends Record<string, any>>({
           </div>
         </div>
 
-        {/* Botón expandir/contraer */}
         <button
           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition"
           onClick={(e) => {
@@ -105,12 +107,12 @@ export default function MobileCard<T extends Record<string, any>>({
         </button>
       </div>
 
-      {/* Contenido expandido */}
       {!compact && (
         <div className="border-t bg-gray-50/50 dark:bg-gray-800/40 p-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
             {orderedEntries.map(([key, value]) => {
               const isObservaciones = key.toLowerCase() === 'observaciones'
+              const fmt = formatters?.[key as keyof T]
 
               return (
                 <div
@@ -121,10 +123,12 @@ export default function MobileCard<T extends Record<string, any>>({
                   )}
                 >
                   <span className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                    {key}
+                    {getLabel(key)}
                   </span>
 
-                  {isImage(value) ? (
+                  {fmt ? (
+                    fmt(value, data)
+                  ) : isImage(value) ? (
                     <Image
                       src={String(value)}
                       alt={key}

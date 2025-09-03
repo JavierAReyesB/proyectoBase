@@ -9,4 +9,7 @@ export { default as ChatWidget }      from './ChatWidget';
 export { default as ChartWidget }     from './ChartWidget';
 export { default as TeamWidget }      from './TeamWidget';
 export { default as ContratosWidget } from './ContratosWidget';
+export { default as DeficienciaWidget } from './DeficienciaWidget';
+
+
 

@@ -1,7 +1,8 @@
 'use client'
 
 import type { PlanTrabajo } from '../services/api'
-import { PlanTrabajoFormulario } from './PlanTrabajoFormulario'
+import PlanTrabajoFormulario from './PlanTrabajoFormulario'
+
 import { PlanTrabajoTabla } from './PlanTrabajoTabla'
 
 export function PlanTrabajoDrawer({ data }: { data: PlanTrabajo }) {
